@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>JobPilot</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon">⚡</span>
+        <h1>JobPilot</h1>
+        <span class="badge">LOCAL AI</span>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-page="tailor">Tailor Resume</button>
+        <button class="tab" data-page="apply">Auto Apply</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- PAGE 1: TAILOR -->
+    <section id="page-tailor" class="page active">
+      <div class="card">
+        <label for="jobDesc">Job Posting Description</label>
+        <textarea id="jobDesc" rows="10" placeholder="Paste the full job posting here..."></textarea>
+      </div>
+
+      <div class="card">
+        <label for="resumeFile">Your Resume (.docx)</label>
+        <div class="file-input-wrap">
+          <input type="file" id="resumeFile" accept=".docx" />
+          <p class="file-status" id="fileStatus">No file selected</p>
+        </div>
+      </div>
+
+      <button id="tailorBtn" class="primary-btn">⚡ Tailor My Resume</button>
+
+      <section class="card result hidden" id="resultCard">
+        <div class="score-row">
+          <span class="score-label">Fit Score</span>
+          <span class="score-value" id="scoreValue">—</span>
+        </div>
+
+        <h2>Tailored Output</h2>
+        <pre id="tailoredText" class="tailored-text"></pre>
+
+        <div class="action-row">
+          <a id="downloadLink" class="primary-btn hidden" download>↓ Download .docx</a>
+          <button id="goToApplyBtn" class="secondary-btn hidden">Next: Apply →</button>
+        </div>
+      </section>
+
+      <div id="tailorStatus" class="status"></div>
+    </section>
+
+    <!-- PAGE 2: APPLY -->
+    <section id="page-apply" class="page">
+      <div class="card info-banner">
+        <span class="info-icon">🤖</span>
+        <div>
+          <p class="banner-title">Automated Application Agent</p>
+          <p class="banner-text">Paste the application URL. A browser window will open and the agent will fill the form using your profile + tailored resume. You'll confirm each step.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <label for="appUrl">Application URL</label>
+        <input type="url" id="appUrl" placeholder="https://jobs.company.com/apply/..." />
+      </div>
+
+      <div class="card">
+        <label>Resume to Upload</label>
+        <div class="resume-status" id="resumeReadyStatus">
+          <span class="status-dot" id="resumeDot"></span>
+          <span id="resumeReadyText">No tailored resume yet — tailor one first</span>
+        </div>
+      </div>
+
+      <button id="startAgentBtn" class="primary-btn" disabled>🚀 Start Agent</button>
+
+      <section class="card agent-log hidden" id="agentLog">
+        <h2>Agent Activity</h2>
+        <div id="logEntries" class="log-entries"></div>
+
+        <div class="confirm-box hidden" id="confirmBox">
+          <p id="confirmText">Agent is waiting for your review.</p>
+          <div class="action-row">
+            <button id="approveBtn" class="primary-btn">✓ Approve & Continue</button>
+            <button id="rejectBtn" class="secondary-btn">✗ Stop</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="applyStatus" class="status"></div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
