@@ -161,8 +161,11 @@ textarea:focus, input:focus { border-color: #6366f1; }
 }
 .secondary-btn:hover { border-color: #6366f1; color: #a5b4fc; }
 
-.action-row { display: flex; gap: 12px; flex-wrap: wrap; }
-
+.action-row {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
 /* RESULTS */
 .hidden { display: none !important; }
 
@@ -208,6 +211,21 @@ textarea:focus, input:focus { border-color: #6366f1; }
   font-size: 15px;
   color: #e2e8f0;
   font-weight: 600;
+}
+
+.result.hidden {
+  display: none;
+}
+
+/* DOCX preview stuff */
+#docx-preview-container {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  max-height: 600px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 /* STATUS */

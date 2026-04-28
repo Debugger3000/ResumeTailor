@@ -14,57 +14,64 @@ const state = {
   tailoredResumePath: null,
   jobDescription: null,
 };
-
 // ========== TAILOR PAGE ==========
 const jobDesc = document.getElementById('jobDesc');
 const resumeFile = document.getElementById('resumeFile');
 const fileStatus = document.getElementById('fileStatus');
 const tailorBtn = document.getElementById('tailorBtn');
+const tailorStatus = document.getElementById('tailorStatus');
 const resultCard = document.getElementById('resultCard');
 const scoreValue = document.getElementById('scoreValue');
-const tailoredText = document.getElementById('tailoredText');
 const downloadLink = document.getElementById('downloadLink');
 const goToApplyBtn = document.getElementById('goToApplyBtn');
-const tailorStatus = document.getElementById('tailorStatus');
+const previewContainer = document.getElementById('docx-preview-container');
 
 resumeFile.addEventListener('change', () => {
   fileStatus.textContent = resumeFile.files[0] ? resumeFile.files[0].name : 'No file selected';
 });
 
 tailorBtn.addEventListener('click', async () => {
+  // Validation
   if (!jobDesc.value.trim() || !resumeFile.files[0]) {
     tailorStatus.textContent = 'Please paste a job description and upload a resume.';
     tailorStatus.className = 'status error';
     return;
   }
 
-  tailorStatus.className = 'status';
-  tailorStatus.textContent = 'Tailoring... this may take a moment.';
-  tailorBtn.disabled = true;
-  resultCard.classList.add('hidden');
-
   const formData = new FormData();
   formData.append('job_description', jobDesc.value);
   formData.append('resume', resumeFile.files[0]);
 
+  tailorBtn.disabled = true;
+  tailorStatus.textContent = 'Tailoring...';
+  tailorStatus.className = 'status';
+  resultCard.classList.add('hidden');  // Hide previous result while working
+
   try {
     const res = await fetch('/api/tailor', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('Server error');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Server error (${res.status})`);
+    }
     const data = await res.json();
 
-    scoreValue.textContent = data.score + '/100';
-    tailoredText.textContent = data.preview_text;
+    // Update result card contents
+    scoreValue.textContent = (data.score ?? 0) + '/100';
     downloadLink.href = data.download_url;
-    downloadLink.classList.remove('hidden');
-    goToApplyBtn.classList.remove('hidden');
+
+    // Reveal the card BEFORE rendering preview so the container has a size
     resultCard.classList.remove('hidden');
 
-    // Save to shared state for apply page
-    state.tailoredResumePath = data.resume_path;
+    // Render the tailored .docx into the preview container
+    await renderDocxPreview(data.preview_url);
+
+    // Save state for the apply page
+    state.sessionId = data.session_id;
+    state.tailoredResumePath = data.download_url;
     state.jobDescription = jobDesc.value;
     updateResumeStatus();
 
-    tailorStatus.textContent = 'Done.';
+    tailorStatus.textContent = 'Done. Review the preview below.';
     tailorStatus.className = 'status success';
   } catch (err) {
     tailorStatus.textContent = 'Something went wrong: ' + err.message;
@@ -73,6 +80,33 @@ tailorBtn.addEventListener('click', async () => {
     tailorBtn.disabled = false;
   }
 });
+
+async function renderDocxPreview(url) {
+  if (typeof docx === 'undefined') {
+    throw new Error('docx-preview library not loaded');
+  }
+
+  previewContainer.innerHTML = '<p>Loading preview...</p>';
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Could not load preview');
+  const blob = await res.blob();
+
+  previewContainer.innerHTML = '';
+  await docx.renderAsync(blob, previewContainer, null, {
+    className: 'docx-preview',
+    inWrapper: true,
+    ignoreWidth: false,
+    ignoreHeight: false,
+    breakPages: true,
+  });
+}
+
+
+
+
+
+// ---------------------------
 
 goToApplyBtn.addEventListener('click', () => switchPage('apply'));
 

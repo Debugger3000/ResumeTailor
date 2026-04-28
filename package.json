@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "docx-preview": "^0.3.7",
+    "jszip": "^3.10.1"
+  }
+}

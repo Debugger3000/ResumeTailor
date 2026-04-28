@@ -22,39 +22,40 @@
 
   <main>
     <!-- PAGE 1: TAILOR -->
-    <section id="page-tailor" class="page active">
-      <div class="card">
-        <label for="jobDesc">Job Posting Description</label>
-        <textarea id="jobDesc" rows="10" placeholder="Paste the full job posting here..."></textarea>
+  <section id="page-tailor" class="page active">
+    <div class="card">
+      <label for="jobDesc">Job Posting Description</label>
+      <textarea id="jobDesc" rows="10" placeholder="Paste the full job posting here..."></textarea>
+    </div>
+
+    <div class="card">
+      <label for="resumeFile">Your Resume (.docx)</label>
+      <div class="file-input-wrap">
+        <input type="file" id="resumeFile" accept=".docx" />
+        <p class="file-status" id="fileStatus">No file selected</p>
+      </div>
+    </div>
+
+    <button id="tailorBtn" class="primary-btn">⚡ Tailor My Resume</button>
+
+    <div id="tailorStatus" class="status"></div>
+
+    <!-- Result card: hidden until tailoring completes -->
+    <section class="card result hidden" id="resultCard">
+      <div class="score-row">
+        <span class="score-label">Fit Score</span>
+        <span class="score-value" id="scoreValue">—</span>
       </div>
 
-      <div class="card">
-        <label for="resumeFile">Your Resume (.docx)</label>
-        <div class="file-input-wrap">
-          <input type="file" id="resumeFile" accept=".docx" />
-          <p class="file-status" id="fileStatus">No file selected</p>
-        </div>
+      <div class="action-row">
+        <a id="downloadLink" class="primary-btn" download>↓ Download .docx</a>
+        <button id="goToApplyBtn" class="secondary-btn">Next: Apply →</button>
       </div>
 
-      <button id="tailorBtn" class="primary-btn">⚡ Tailor My Resume</button>
-
-      <section class="card result hidden" id="resultCard">
-        <div class="score-row">
-          <span class="score-label">Fit Score</span>
-          <span class="score-value" id="scoreValue">—</span>
-        </div>
-
-        <h2>Tailored Output</h2>
-        <pre id="tailoredText" class="tailored-text"></pre>
-
-        <div class="action-row">
-          <a id="downloadLink" class="primary-btn hidden" download>↓ Download .docx</a>
-          <button id="goToApplyBtn" class="secondary-btn hidden">Next: Apply →</button>
-        </div>
-      </section>
-
-      <div id="tailorStatus" class="status"></div>
+      <h2>Preview</h2>
+      <div id="docx-preview-container"></div>
     </section>
+  </section>
 
     <!-- PAGE 2: APPLY -->
     <section id="page-apply" class="page">
@@ -97,7 +98,9 @@
       <div id="applyStatus" class="status"></div>
     </section>
   </main>
-
+  
+  <script src="{{ url_for('static', filename='vendor/jszip.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/docx-preview.min.js') }}"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
