@@ -1,3 +1,9 @@
+
+// Page starting
+console.log("JS script is running...");
+
+
+
 // ========== TAB SWITCHING ==========
 const tabs = document.querySelectorAll('.tab');
 const pages = document.querySelectorAll('.page');
@@ -25,6 +31,8 @@ const scoreValue = document.getElementById('scoreValue');
 const downloadLink = document.getElementById('downloadLink');
 const goToApplyBtn = document.getElementById('goToApplyBtn');
 const previewContainer = document.getElementById('docx-preview-container');
+const modelSummary = document.getElementById('modelSummary');
+const changesCount = document.getElementById('changesCount');
 
 resumeFile.addEventListener('change', () => {
   fileStatus.textContent = resumeFile.files[0] ? resumeFile.files[0].name : 'No file selected';
@@ -54,9 +62,14 @@ tailorBtn.addEventListener('click', async () => {
       throw new Error(err.error || `Server error (${res.status})`);
     }
     const data = await res.json();
+    console.log("Tailor Response: ", data);
 
     // Update result card contents
     scoreValue.textContent = (data.score ?? 0) + '/100';
+    modelSummary.textContent = data.model_summary || 'No summary returned.';
+    changesCount.textContent = data.changes_count != null
+      ? `(${data.changes_count} paragraphs)`
+      : '';
     downloadLink.href = data.download_url;
 
     // Reveal the card BEFORE rendering preview so the container has a size
@@ -74,6 +87,7 @@ tailorBtn.addEventListener('click', async () => {
     tailorStatus.textContent = 'Done. Review the preview below.';
     tailorStatus.className = 'status success';
   } catch (err) {
+    console.log(err);
     tailorStatus.textContent = 'Something went wrong: ' + err.message;
     tailorStatus.className = 'status error';
   } finally {

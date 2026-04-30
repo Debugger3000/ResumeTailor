@@ -8,7 +8,7 @@ if (Test-Path $envFile) {
     }
 }
 
-$model = if ($env:OLLAMA_MODEL) { $env:OLLAMA_MODEL } else { "llama3.1:8b" }
+$model = if ($env:OLLAMA_MODEL) { $env:OLLAMA_MODEL } else { "qwen3.5:9b" }
 
 Write-Host "Checking if Ollama is already running..." -ForegroundColor Cyan
 
@@ -28,6 +28,7 @@ if ($running) {
 }
 
 Write-Host "Loading model: $model" -ForegroundColor Cyan
-ollama run $model ""
+ollama run $model "" *> $null
+# ollama run $model ""
 
 Write-Host "Ollama ready" -ForegroundColor Green

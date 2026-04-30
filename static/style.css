@@ -322,3 +322,32 @@ textarea:focus, input:focus { border-color: #6366f1; }
 ::-webkit-scrollbar-track { background: #0a0f1a; }
 ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #312e81; }
+
+
+
+
+
+
+
+
+
+.changes-summary {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.changes-summary h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  color: #aaa;
+}
+.changes-count {
+  font-weight: normal;
+  opacity: 0.7;
+}
+.changes-summary p {
+  margin: 0;
+  line-height: 1.5;
+}

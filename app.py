@@ -8,7 +8,7 @@ from blueprints.apply import apply_bp
 from services.ollama_lifecycle import start_ollama
 
 # Run Devleopment
-# hypercorn app:app -c hypercorn.toml
+# hypercorn app:app -c hypercorn.toml --reload
 
 # App instance var
 app = Quart(__name__)
@@ -24,7 +24,9 @@ async def index():
 
 @app.before_serving
 async def _startup():
-    start_ollama()
+    #start_ollama()
+    print("Starting server...")
+
 
 
 
