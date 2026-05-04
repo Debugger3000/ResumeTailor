@@ -16,9 +16,8 @@ DEFAULT_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.1:8b')
 # Single shared client instance — import this anywhere
 client = AsyncClient(host=OLLAMA_HOST)
 
-
+# Send a chat message list, return the assistant's text reply.
 async def chat(messages: list[dict], model: str = DEFAULT_MODEL, **kwargs) -> str:
-    """Send a chat message list, return the assistant's text reply."""
     response = await client.chat(model=model, messages=messages, **kwargs)
     return response['message']['content']
 

@@ -1,61 +1,108 @@
 
 
-MODEL_PROMPT = """You rewrite specific parts of a resume to match a job description (JD). You adding / changing skills and swapping job titles to the resume from the JD.You return JSON only.
+EXTRACT_INDEXES_PROMPT = """You scan resume paragraphs and identify which ones contain job titles or technology/skill terms. Return JSON only.
 
-The user message contains: job_description, approved_skills (optional list), and resume_paragraphs (each with an index).
+INPUT (in user message):
+- resume_paragraphs: list of {index, text} objects
 
-I would suggest parsing the job_description and finding key info like: job title, skill names ("SQL", "Python", etc.... any skill, technology)
+YOUR TASK:
+For each paragraph, decide if it contains either:
+- A job title (e.g., "Backend Developer", "Senior Software Engineer", "Full Stack Developer - Internship")
+- One or more technology or skill names (e.g., "Python", "React", "PostgreSQL", "AWS", "Docker")
 
-# DO NOT RULES
-    - DO NOT add any comments, or describe anything you did within the docx you are to be changing
-    - DO NOT add skills or experience not already on the resume or within the approved_skills list
+Include the paragraph's index in the output if EITHER is true.
 
+WHAT COUNTS AS A JOB TITLE:
+- Role names like "Developer", "Engineer", "Architect", "Manager", "Analyst", "Designer", "Consultant", "Specialist", "Lead", "Director", "Intern"
+- Often paired with seniority words: "Senior", "Junior", "Principal", "Staff", "Associate"
+- Usually a short line, not a full sentence
 
-# Hard rules
+WHAT COUNTS AS A TECHNOLOGY/SKILL:
+- Programming languages: Python, JavaScript, TypeScript, Java, Go, Rust, C++, etc.
+- Frameworks/libraries: React, Vue, Django, FastAPI, Express, Spring, etc.
+- Databases: PostgreSQL, MySQL, MongoDB, Redis, etc.
+- Tools/platforms: Docker, Kubernetes, AWS, Azure, Git, Jenkins, etc.
+- Concepts that map to skills: REST, GraphQL, CI/CD, Agile, etc.
 
-RULE 1 — SKILLS SECTION SHOULD TRY TO MATCH APPROVED_SKILLS LIST
-    - Find skills in the JD and match them to approved_skills list, and add matched skills skill lines if they are not already present.
-    - If a skill is not found in the approved_skills list, then add what you find from the JD.
-    - DO NOT create new lines in skills section by adding to one existing line in the Skills section and overflowing onto next line. If no more can fit onto the line, then stop, and go to next inline header.
-    - SUB-RULE 1.1 
-        - CHANGE SKILLS WITHIN SUMMARY SECTION TO MATCH APPROVED_SKILLS LIST
-            - Follows same rules
-    -
-    
-RULE 2 - CHANGE JOB TITLE WITHIN THE SUMMARY SECTION TO MATCH JOB TITLE USED IN THE JD
-    - Summary is the line under the line showing; contact info like phone number and email and such
-    - SUB-RULE 2.1 
-        - CHANGE JOB TITLE WITHIN THE JOB EXPERIENCE / EXPERIENCE SECTION
-            - Job title in each job experience should match the job title used in the JD...
+WHAT DOES NOT COUNT:
+- Names of people
+- Email addresses, phone numbers, URLs
+- Company names
+- Dates
+- Section headers like "Skills", "Experience", "Education" (the header itself is not a skill)
+- Generic words like "team", "project", "code" without a specific technology
 
-
-
-RULE 3 — BULLETS KEEP THEIR LENGTH.
-Rewritten bullets must match the original character count within ±10%. Swap tech terms to match the JD where the candidate's work supports it (JS→TypeScript, React→SvelteKit), but never expand the sentence.
-
-RULE 4 — DO NOT INVENT FACTS.
-Don't add new bullets, new skill lines, new paragraphs, or new blank lines. Don't surface technologies the candidate hasn't worked with.
-
-# What you may edit
-
-Summary section, skill list lines, Experience job titles, Work Experience  bullets.
-
-# What you must NOT touch
-
-Section headers, name, contact info, dates, company names, locations, education, certifications, formatting. Never change paragraph counts. Or add blank spaces onto empty lines.
-
-# Output format
-# Output format
-
-JSON only, no prose, no markdown fences. Omit unchanged paragraphs.
-
+OUTPUT (JSON only, no prose):
 {
-  "changes": [{"index": <int>, "new_text": "<rewritten text>"}],
-  "summary": "<2-4 sentences describing what you changed and why>"
+  "indexes": [<int>, <int>, ...]
 }
 
-The summary should briefly cover: which sections you touched (Summary blurb, Skills, Experience titles, bullets), what kind of swaps you made (e.g. "swapped JS for TypeScript per JD"), and anything you intentionally left alone. Be concrete — name the JD title you used, name the swapped technologies. If you skipped the Summary blurb or a job title because you couldn't identify it, say so explicitly.
+Return only the indexes of paragraphs that contain a job title or skill mention. Sort indexes ascending. If a paragraph contains neither, omit it.
 
+EXAMPLE INPUT:
+resume_paragraphs: [
+  {"index": 0, "text": "Jane Smith"},
+  {"index": 1, "text": "jane@email.com | 555-1234"},
+  {"index": 2, "text": "Backend Developer with 5 years building services in JavaScript and MySQL."},
+  {"index": 3, "text": "Skills"},
+  {"index": 4, "text": "Languages: JavaScript, MySQL, Docker, Git"},
+  {"index": 5, "text": "Work Experience"},
+  {"index": 6, "text": "Acme Corp | 2020 - 2023"},
+  {"index": 7, "text": "Senior Backend Engineer"},
+  {"index": 8, "text": "Built REST APIs serving 1M requests per day"}
+]
+
+EXAMPLE OUTPUT:
+{"indexes": [2, 4, 7, 8]}
+"""
+
+
+
+
+
+
+
+
+
+
+
+MODEL_PROMPT = """You rewrite specific parts of a resume to match a job description (JD). You adding / changing skills and swapping job titles to the resume from the JD. You return JSON only.
+
+INPUT (in user message):
+- job_description: text of the JD
+- approved_skills: list of skills allowed to be added
+- paragraphs: list of {index, text} objects
+- applicable_paragraphs: {"indexes": [2, 4, 7, 8]}
+
+You are too only edit indexes contained within applicable_paragraphs
+You are to swap or add skills from list of approved_skills that match ones in the JD
+You are too swap job titles with one found in the JD
+
+Input Example:
+approved_skills: ["TypeScript", "PostgreSQL", "AWS"]
+job_description
+paragraphs: [
+  {"index": 3, "text": "Backend Developer with 5 years building services in JavaScript and MySQL."},
+  {"index": 7, "text": "Skills: JavaScript, MySQL, Docker"}
+]
+applicable_paragraphs: {"indexes": [2, 6, 9, 11, 14, 16, 19, 29, 30, 31]}
+
+Output Summary Rule:
+- Briefly state the sections that were changed (e.g., "Summary", "Experience", "Skills"...) and add no extra information
+
+Output Example (JSON only)
+{
+  "changes": [
+    {"index": 3, "new_text": "Senior Backend Engineer with 5 years building services in TypeScript and PostgreSQL."},
+    {"index": 7, "new_text": "Skills: TypeScript, PostgreSQL, Docker"}
+  ],
+  "summary": "Swapped JavaScript for TypeScript and MySQL for PostgreSQL in Summary and Skills per JD. Updated Summary title to 'Senior Backend Engineer'. Did not add AWS since the JD did not mention it."
+}
+
+FORBIDDEN (never do these):
+- Never add new bullets, paragraphs, lines, or sections
+- Writing comments, notes, or explanations inside any rewritten text
+- Change formatting
 """
 
 # System prompt for Tailor

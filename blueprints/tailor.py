@@ -11,6 +11,7 @@ from services.tailor_agent import (
     extract_paragraphs,
     tailor_resume_in_place,  # new — does everything internally
     score_fit,
+    extract_applicable_paragraphs
 )
 
 # blueprint - route name is 'tailor'
@@ -45,12 +46,25 @@ async def tailor():
     await resume_file.save(original_path)
 
     
-
+    # extract each line / paragraphs of docx file
     paragraphs = extract_paragraphs(original_path)
+
+
+    # Model Processing Stages
+    # 1. Get applicable doc indexes by filtering for job titles or skill matches
+    applicable_paragraphs = await extract_applicable_paragraphs(paragraphs)
+
+
+    # 2. Process each line for tailoring
+        # run list of lines / paragraphs to model to swap ones that match model prompt
+            # summary, skills, job titles, bullet points...
     changes_count, model_summary = await tailor_resume_in_place(
-        original_path, output_path, paragraphs, job_description, approved_skills,
+        original_path, output_path, paragraphs, applicable_paragraphs, job_description, approved_skills,
     )
-    score = await score_fit(paragraphs, job_description)
+    print("After Model Summary")
+
+    #
+    # score = await score_fit(paragraphs, job_description)
 
     SESSIONS[session_id] = {
         'original_filename': resume_file.filename,
@@ -62,7 +76,6 @@ async def tailor():
     print("Returning response from tailor route.")
     return jsonify({
         'session_id': session_id,
-        'score': score,
         'changes_count': changes_count,
         'model_summary': model_summary,
         'preview_url': f'/api/tailor/preview/{session_id}',
