@@ -19,6 +19,7 @@ tabs.forEach(t => t.addEventListener('click', () => switchPage(t.dataset.page)))
 const state = {
   tailoredResumePath: null,
   jobDescription: null,
+  browserSessionId: null,
 };
 // ========== TAILOR PAGE ==========
 const jobDesc = document.getElementById('jobDesc');
@@ -127,6 +128,7 @@ goToApplyBtn.addEventListener('click', () => switchPage('apply'));
 // ========== APPLY PAGE ==========
 const appUrl = document.getElementById('appUrl');
 const startAgentBtn = document.getElementById('startAgentBtn');
+const beginBtn = document.getElementById('beginBtn');
 const resumeDot = document.getElementById('resumeDot');
 const resumeReadyText = document.getElementById('resumeReadyText');
 const agentLog = document.getElementById('agentLog');
@@ -182,11 +184,16 @@ startAgentBtn.addEventListener('click', async () => {
     });
     const data = await res.json();
 
+    // track browser id
+    state.browserSessionId = data.session_id;
+
     addLog('Browser launched and navigated to URL', 'success');
     addLog(data.message || 'Awaiting first step...', 'action');
+
+    beginBtn.classList.remove('hidden');
+
     // Stub: real flow would stream agent actions via SSE or polling
-    confirmText.textContent = 'Backend stub — implement agent polling / SSE here.';
-    confirmBox.classList.remove('hidden');
+    
   } catch (err) {
     addLog('Error: ' + err.message, 'warning');
     applyStatus.textContent = 'Agent failed to start.';
@@ -194,12 +201,50 @@ startAgentBtn.addEventListener('click', async () => {
   }
 });
 
+
+// ------
+// Begin applying with agent button
+// -----
+beginBtn.addEventListener('click', async () => {
+  if (!state.sessionId) return;
+
+  beginBtn.disabled = true;
+  addLog('Beginning agent on current page...', 'action');
+
+  try {
+    const res = await fetch('/api/apply/begin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: state.sessionId }),
+    });
+    const data = await res.json();
+
+    addLog('Page data received', 'success');
+    console.log('Page HTML length:', data.html?.length);
+    // Next step: render what the agent saw, show confirm box, etc.
+
+    confirmText.textContent = 'Backend stub — implement agent polling / SSE here.';
+    confirmBox.classList.remove('hidden');
+  } catch (err) {
+    addLog('Begin failed: ' + err.message, 'warning');
+    beginBtn.disabled = false;
+  }
+});
+
+
+// ------
+// Continue applying with agent button
+// -----
 approveBtn.addEventListener('click', async () => {
   addLog('User approved — continuing to next step', 'success');
   confirmBox.classList.add('hidden');
   // TODO: POST /api/apply/continue
 });
 
+
+// ------
+// Stop applying with agent button
+// -----
 rejectBtn.addEventListener('click', async () => {
   addLog('User stopped the agent', 'warning');
   confirmBox.classList.add('hidden');

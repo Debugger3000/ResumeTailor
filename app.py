@@ -15,7 +15,7 @@ app = Quart(__name__)
 
 # Routes
 app.register_blueprint(tailor_bp, url_prefix='/api')
-app.register_blueprint(apply_bp, url_prefix='/api/apply')
+app.register_blueprint(apply_bp, url_prefix='/api')
 
 # Base route
 @app.route('/')
