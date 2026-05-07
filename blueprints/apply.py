@@ -1,7 +1,9 @@
 from quart import Blueprint, request, jsonify
 from services.browser import manager
 import uuid
-from services.apply import get_page_html
+from services.apply import extract_form_fields, fill_fields, get_focused_page
+from services.apply_agent import populate_field_values
+from services.browser_helpers import resolve_active_page, wait_for_page_ready, find_form_target, click_continue
 
 apply_bp = Blueprint('apply', __name__)
 
@@ -13,7 +15,8 @@ apply_bp = Blueprint('apply', __name__)
 # Once permission given, agent grabs form fields and fills in data
 # Agent notifies user
 
-
+# Start the browser session
+# -----
 @apply_bp.route('/start', methods=['POST'])
 async def apply_start():
     data = await request.get_json()
@@ -44,18 +47,39 @@ async def apply_start():
     })
 
 # Begin applying with agent
-@apply_bp.route('/apply/begin', methods=['POST'])
+@apply_bp.route('/begin', methods=['POST'])
 async def apply_begin():
     print("begin hit")
-    data = await request.get_json()
-    session = manager.get(data['session_id'])
-    if not session:
-        return jsonify({'error': 'unknown session'}), 404
 
-    html = get_page_html(session)
+    session = manager.current
+    if not session:
+        return jsonify({'error': 'no active session — call /start first'}), 400
+
+
+    page = await resolve_active_page(session)
+    session.last_known_page = page
+    print(f"active page: {page.url}")
+
+    await wait_for_page_ready(page)
+
+    target = await find_form_target(page)
+    print(f"form target: {target.url if hasattr(target, 'url') else 'main frame'}")
+
+
+    #html = await get_page_html(session)
+    fields = await extract_form_fields(target)
+    # give model fields data, so it can populate it with user data
+    populated_fields = await populate_field_values(fields)
+    # pass populated_fields and sessions page to be filled with data
+    summary = await fill_fields(page, populated_fields)
+
+
+    # print("html input fields grabbed from extract_form_fields")
+    # print(fields)
 
     return jsonify({
-        'html': html,    
+        'fields': populated_fields,
+        'summary': summary,
     })
 
 
@@ -78,3 +102,26 @@ async def apply_stop():
     data = await request.get_json()
     await manager.close_session(data['session_id'])
     return jsonify({'status': 'stopped'})
+
+
+
+@apply_bp.route('/advance', methods=['POST'])
+async def apply_advance():
+    """Click Continue/Submit on the current page and report what happened."""
+    session = manager.current
+    if not session:
+        return jsonify({'error': 'no active session'}), 400
+    
+    page = await resolve_active_page(session)
+    advanced = await click_continue(page)
+    
+    if advanced:
+        # Re-resolve in case the click opened a new tab
+        page = await resolve_active_page(session)
+        await wait_for_page_ready(page)
+        session.last_known_page = page
+    
+    return jsonify({
+        'advanced': advanced,
+        'url': page.url,
+    })

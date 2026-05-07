@@ -139,19 +139,21 @@ const approveBtn = document.getElementById('approveBtn');
 const rejectBtn = document.getElementById('rejectBtn');
 const applyStatus = document.getElementById('applyStatus');
 
-function updateResumeStatus() {
-  if (state.tailoredResumePath) {
-    resumeDot.classList.add('ready');
-    resumeReadyText.textContent = 'Tailored resume ready ✓';
-    startAgentBtn.disabled = !appUrl.value;
-  } else {
-    resumeDot.classList.remove('ready');
-    resumeReadyText.textContent = 'No tailored resume yet — tailor one first';
-    startAgentBtn.disabled = true;
-  }
-}
+// function updateResumeStatus() {
+//   if (state.tailoredResumePath) {
+//     resumeDot.classList.add('ready');
+//     resumeReadyText.textContent = 'Tailored resume ready ✓';
+//     startAgentBtn.disabled = !appUrl.value;
+//   }
+  
+//   else {
+//     resumeDot.classList.remove('ready');
+//     resumeReadyText.textContent = 'No tailored resume yet — tailor one first';
+//     startAgentBtn.disabled = true;
+//   }
+// }
 
-appUrl.addEventListener('input', updateResumeStatus);
+// appUrl.addEventListener('input', updateResumeStatus);
 
 function addLog(message, type = '') {
   const entry = document.createElement('div');
@@ -163,7 +165,7 @@ function addLog(message, type = '') {
 }
 
 startAgentBtn.addEventListener('click', async () => {
-  if (!state.tailoredResumePath || !appUrl.value) return;
+  if (!appUrl.value) return;
 
   agentLog.classList.remove('hidden');
   logEntries.innerHTML = '';
@@ -206,7 +208,10 @@ startAgentBtn.addEventListener('click', async () => {
 // Begin applying with agent button
 // -----
 beginBtn.addEventListener('click', async () => {
-  if (!state.sessionId) return;
+  console.log("Begin button clcked....");
+  if (!state.browserSessionId) return;
+
+  console.log("Begin button clcked....222222222222");
 
   beginBtn.disabled = true;
   addLog('Beginning agent on current page...', 'action');
@@ -219,8 +224,10 @@ beginBtn.addEventListener('click', async () => {
     });
     const data = await res.json();
 
+    
+
     addLog('Page data received', 'success');
-    console.log('Page HTML length:', data.html?.length);
+    console.log('Pages form fields', data.populated_fields);
     // Next step: render what the agent saw, show confirm box, etc.
 
     confirmText.textContent = 'Backend stub — implement agent polling / SSE here.';

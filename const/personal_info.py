@@ -1,6 +1,6 @@
 
 
-profile = {
+PROFILE = {
     "personal": {
         "first_name": "John",
         "middle_name": "Michael",
