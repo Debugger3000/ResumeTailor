@@ -1,15 +1,22 @@
 
+from const.approved_skills import approved_skills
 
 PROFILE = {
     "personal": {
         "first_name": "John",
         "middle_name": "Michael",
         "last_name": "Doe",
+        "full_name": "John Doe",
         "preferred_name": "John",
         "pronouns": "he/him",
         "email": "john.doe@example.com",
         "phone": "+1-416-555-0142",
         "date_of_birth": "1995-04-12",
+    },
+
+    "new_account": {
+        "password": "PacmaN83$",
+        "confirm_password": "PacmaN83$",
     },
 
     "address": {
@@ -24,8 +31,6 @@ PROFILE = {
         "linkedin": "https://linkedin.com/in/johndoe",
         "github": "https://github.com/johndoe",
         "portfolio": "https://johndoe.dev",
-        "twitter": None,
-        "other": None,
     },
 
     "work_authorization": {
@@ -33,21 +38,16 @@ PROFILE = {
         "status": "Canadian citizen",
         "requires_sponsorship_now": False,
         "requires_sponsorship_future": False,
-        "authorized_countries": ["Canada", "United States"],
+        "authorized_countries": ["Canada"],
         "notes": "Authorized to work in Canada and the US under USMCA TN status.",
     },
 
     "preferences": {
         "desired_salary": "95000",
         "desired_salary_currency": "CAD",
-        "salary_period": "annual",
         "willing_to_relocate": True,
         "preferred_locations": ["Toronto, ON", "Remote"],
-        "remote_preference": "hybrid",
-        "earliest_start_date": "2026-06-01",
-        "notice_period_weeks": 2,
         "open_to_travel": True,
-        "max_travel_percent": 25,
         "employment_types": ["full-time", "contract"],
     },
 
@@ -82,21 +82,13 @@ PROFILE = {
             "start_date": "2016-09",
             "end_date": "2020-05",
             "gpa": "3.8",
-            "gpa_scale": "4.0",
-            "honors": "Dean's List 2018-2020",
         },
     ],
 
-    "skills": {
-        "languages_programming": ["Python", "TypeScript", "JavaScript", "Go", "SQL"],
-        "frameworks": ["React", "Next.js", "FastAPI", "Django", "Node.js"],
-        "tools": ["Docker", "Kubernetes", "Git", "AWS", "Terraform"],
-        "databases": ["PostgreSQL", "MongoDB", "Redis"],
-    },
+    "skills": approved_skills,
 
     "languages_spoken": [
         {"language": "English", "proficiency": "native"},
-        {"language": "French", "proficiency": "conversational"},
     ],
 
     "demographics_voluntary": {
@@ -121,13 +113,5 @@ PROFILE = {
         "why_this_role": "The role aligns well with my background in distributed systems and my interest in developer-facing infrastructure. I want to build tools that make other engineers more effective.",
         "greatest_strength": "I default to writing things down. Design docs, postmortems, decision records — they save the team time and keep me honest about my reasoning.",
         "biggest_weakness": "I tend to over-invest in tooling early in a project. I've gotten better at recognizing when a manual workaround is the right call.",
-        "career_goals": "Continue growing as a senior IC, eventually moving toward staff-level work on systems that are foundational to a product.",
-    },
-
-    "documents": {
-        "resume_path": "/home/user/documents/john_doe_resume.pdf",
-        "cover_letter_path": "/home/user/documents/john_doe_cover_letter.pdf",
-        "transcript_path": None,
-        "portfolio_path": None,
     },
 }

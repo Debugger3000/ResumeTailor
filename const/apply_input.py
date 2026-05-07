@@ -70,7 +70,6 @@ inputs_field_schema = {
 #   "question": "Email address",    // the actual question being asked
 #   "name": "q_abc123",              // form field name — preserve exactly, may be null
 #   "options": null,                // [{value, label}] for select and radio fields, null otherwise
-#   "required": true,
 #   "value": ""                     // YOU populate this
 # }
 

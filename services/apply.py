@@ -252,6 +252,49 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
     fields = await page_or_frame.evaluate("""
         () => {
             const results = [];
+                                          
+            // Add this helper near the top of the evaluate function
+            function isLikelyHoneypot(el) {
+                const cs = getComputedStyle(el);
+
+                // Standard CSS hides
+                if (cs.display === 'none') return true;
+                if (cs.visibility === 'hidden') return true;
+                if (cs.opacity === '0') return true;
+
+                // Zero or near-zero size
+                const r = el.getBoundingClientRect();
+                if (r.width < 2 || r.height < 2) return true;
+
+                // Positioned off-screen (common honeypot trick)
+                if (r.left + r.width < 0 || r.top + r.height < 0) return true;
+                if (r.left > window.innerWidth + 1000) return true;
+
+                // tabindex=-1 on a text input is suspicious — real forms don't skip
+                // their own inputs in tab order
+                if (el.getAttribute('tabindex') === '-1') return true;
+
+                // autocomplete=off combined with no label is another tell, but too
+                // aggressive on its own — skip unless we want to be paranoid
+
+                // Walk up a few ancestors and check if any of them is hidden
+                let node = el.parentElement;
+                let depth = 0;
+                while (node && depth < 5) {
+                    const ncs = getComputedStyle(node);
+                    if (ncs.display === 'none' || ncs.visibility === 'hidden') return true;
+                    // Off-screen wrapper (e.g. position:absolute; left:-9999px)
+                    if (ncs.position === 'absolute' || ncs.position === 'fixed') {
+                        const left = parseFloat(ncs.left);
+                        const top = parseFloat(ncs.top);
+                        if (left < -1000 || top < -1000) return true;
+                    }
+                    node = node.parentElement;
+                    depth++;
+                }
+
+                return false;
+            }                            
             
             // ---- helper: find the question text for an element or radio group ----
             function findQuestion(el) {
@@ -327,6 +370,7 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
             let idCounter = 0;
             
             nonRadios.forEach((el) => {
+                if (isLikelyHoneypot(el)) return;   // get rid of honeypot input fields
                 const agentId = `field-${idCounter++}`;
                 el.setAttribute('data-agent-id', agentId);
                 
@@ -339,16 +383,13 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
                 
                 results.push({
                     agent_id: agentId,
-                    tag: el.tagName.toLowerCase(),
                     kind: el.tagName === 'SELECT' ? 'select'
                         : el.tagName === 'TEXTAREA' ? 'textarea'
                         : (el.type || 'text'),
-                    input_type: el.type || null,
-                    name: el.name || null,
                     question: findQuestion(el),
+                    name: el.name || null,
                     options: options,
-                    required: el.required || el.getAttribute('aria-required') === 'true',
-                    current_value: el.value || '',
+                    value: el.value || '',
                 });
             });
             
@@ -362,6 +403,10 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
             });
             
             Object.entries(groups).forEach(([name, radioList]) => {
+                                          
+                const visibleRadios = radioList.filter(r => !isLikelyHoneypot(r));
+                if (visibleRadios.length === 0) return;   // ← add this
+                                          
                 const agentId = `field-${idCounter++}`;
                 
                 // Tag every radio in the group with the SAME agent_id so locator works
@@ -378,14 +423,11 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
                 
                 results.push({
                     agent_id: agentId,
-                    tag: 'input',
-                    kind: 'radio',
-                    input_type: 'radio',
-                    name: name,
+                    kind: 'radio',   
                     question: question,
+                    name: name,
                     options: options,
-                    required: radioList.some(r => r.required || r.getAttribute('aria-required') === 'true'),
-                    current_value: anyChecked ? anyChecked.value : '',
+                    value: anyChecked ? anyChecked.value : '',
                 });
             });
             
@@ -393,3 +435,7 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
         }
     """)
     return fields
+
+
+
+

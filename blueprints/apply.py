@@ -4,6 +4,7 @@ import uuid
 from services.apply import extract_form_fields, fill_fields, get_focused_page
 from services.apply_agent import populate_field_values
 from services.browser_helpers import resolve_active_page, wait_for_page_ready, find_form_target, click_continue
+from services.apply_fields_filter import filter_fields
 
 apply_bp = Blueprint('apply', __name__)
 
@@ -68,8 +69,11 @@ async def apply_begin():
 
     #html = await get_page_html(session)
     fields = await extract_form_fields(target)
+
+    filtered_fields = filter_fields(fields)
+    print(f"fields returned:\n {fields}")
     # give model fields data, so it can populate it with user data
-    populated_fields = await populate_field_values(fields)
+    populated_fields = await populate_field_values(filtered_fields)
     # pass populated_fields and sessions page to be filled with data
     summary = await fill_fields(page, populated_fields)
 
