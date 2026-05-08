@@ -3,6 +3,8 @@ import os
 import time
 from ollama import AsyncClient
 
+
+from database.queries.get_user_data_apply import get_user_profile, get_user_skills, get_work_experience
 from const.apply_input import POPULATE_FIELDS_PROMPT
 from const.personal_info import PROFILE  # adjust import to wherever your profile lives
 
@@ -49,13 +51,25 @@ POPULATE_FIELDS_SCHEMA = {
 }
 
 
+def get_full_user_data() -> dict:
+    """
+    Aggregate user data from all sources into a single flat-ish dict
+    suitable for passing to the model.
+    """
+    return {
+        **get_user_profile(),         # spread profile keys at top level
+        "experience": get_work_experience(),
+        "skills": get_user_skills(),
+    }
+
+
 async def populate_field_values(fields: list[dict]) -> tuple[list[dict], float]:
     """
     Given the extracted form fields, ask the model to populate each field's
     `value` based on the user's profile. Returns the fields list with values filled.
     """
     user_prompt = json.dumps({
-        'profile': PROFILE,
+        'profile': get_full_user_data(), # grab all user data needed to populate forms
         'fields': fields,
     })
 

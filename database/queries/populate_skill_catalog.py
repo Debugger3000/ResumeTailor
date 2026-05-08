@@ -1,0 +1,147 @@
+"""Seed data for the skill_catalog table. Idempotent — safe to run repeatedly."""
+
+SKILL_SEED = [
+    # Languages
+    ('JavaScript', 'Language'),
+    ('TypeScript', 'Language'),
+    ('Python', 'Language'),
+    ('Java', 'Language'),
+    ('C', 'Language'),
+    ('C++', 'Language'),
+    ('C#', 'Language'),
+    ('Go', 'Language'),
+    ('Rust', 'Language'),
+    ('Ruby', 'Language'),
+    ('PHP', 'Language'),
+    ('Kotlin', 'Language'),
+    ('Swift', 'Language'),
+    ('Dart', 'Language'),
+    ('Scala', 'Language'),
+    ('Elixir', 'Language'),
+    ('HTML', 'Language'),
+    ('CSS', 'Language'),
+    ('SQL', 'Language'),
+    ('Bash', 'Language'),
+    ('PowerShell', 'Language'),
+
+    # Frontend
+    ('React', 'Frontend'),
+    ('Next.js', 'Frontend'),
+    ('Vue.js', 'Frontend'),
+    ('Nuxt.js', 'Frontend'),
+    ('Angular', 'Frontend'),
+    ('Svelte', 'Frontend'),
+    ('SvelteKit', 'Frontend'),
+    ('Astro', 'Frontend'),
+    ('Tailwind CSS', 'Frontend'),
+    ('Sass', 'Frontend'),
+    ('Bootstrap', 'Frontend'),
+    ('Redux', 'Frontend'),
+    ('Zustand', 'Frontend'),
+    ('Vite', 'Frontend'),
+    ('Webpack', 'Frontend'),
+    ('jQuery', 'Frontend'),
+
+    # Backend
+    ('Node.js', 'Backend'),
+    ('Express.js', 'Backend'),
+    ('NestJS', 'Backend'),
+    ('Fastify', 'Backend'),
+    ('Elysia', 'Backend'),
+    ('Bun', 'Backend'),
+    ('Deno', 'Backend'),
+    ('Django', 'Backend'),
+    ('Flask', 'Backend'),
+    ('FastAPI', 'Backend'),
+    ('Quart', 'Backend'),
+    ('Spring Boot', 'Backend'),
+    ('ASP.NET Core', 'Backend'),
+    ('Ruby on Rails', 'Backend'),
+    ('Laravel', 'Backend'),
+    ('REST APIs', 'Backend'),
+    ('GraphQL', 'Backend'),
+    ('gRPC', 'Backend'),
+    ('WebSockets', 'Backend'),
+
+    # Mobile
+    ('React Native', 'Mobile'),
+    ('Flutter', 'Mobile'),
+    ('Expo', 'Mobile'),
+    ('Android', 'Mobile'),
+    ('iOS', 'Mobile'),
+
+    # Databases
+    ('PostgreSQL', 'Database'),
+    ('MySQL', 'Database'),
+    ('SQLite', 'Database'),
+    ('MongoDB', 'Database'),
+    ('Redis', 'Database'),
+    ('Supabase', 'Database'),
+    ('Firebase', 'Database'),
+    ('DynamoDB', 'Database'),
+    ('Prisma', 'Database'),
+    ('Drizzle ORM', 'Database'),
+
+    # Cloud & DevOps
+    ('AWS', 'Cloud'),
+    ('Azure', 'Cloud'),
+    ('Google Cloud Platform', 'Cloud'),
+    ('DigitalOcean', 'Cloud'),
+    ('Vercel', 'Cloud'),
+    ('Cloudflare', 'Cloud'),
+    ('Docker', 'DevOps'),
+    ('Kubernetes', 'DevOps'),
+    ('Terraform', 'DevOps'),
+    ('Ansible', 'DevOps'),
+    ('GitHub Actions', 'DevOps'),
+    ('GitLab CI', 'DevOps'),
+    ('Jenkins', 'DevOps'),
+    ('NGINX', 'DevOps'),
+    ('Apache', 'DevOps'),
+    ('Linux', 'DevOps'),
+    ('PM2', 'DevOps'),
+
+    # Architecture
+    ('Microservices', 'Architecture'),
+    ('Monolithic Architecture', 'Architecture'),
+    ('Serverless', 'Architecture'),
+    ('Event-Driven Architecture', 'Architecture'),
+    ('MVC', 'Architecture'),
+    ('Clean Architecture', 'Architecture'),
+    ('CI/CD', 'Architecture'),
+    ('Test-Driven Development', 'Architecture'),
+    ('Agile', 'Architecture'),
+    ('Scrum', 'Architecture'),
+
+    # Networking & Security
+    ('TCP/IP', 'Networking'),
+    ('HTTP/HTTPS', 'Networking'),
+    ('DNS', 'Networking'),
+    ('TLS/SSL', 'Networking'),
+    ('OAuth 2.0', 'Networking'),
+    ('JWT', 'Networking'),
+    ('Reverse Proxy', 'Networking'),
+    ('Load Balancing', 'Networking'),
+    ('CDN', 'Networking'),
+    ('VPN', 'Networking'),
+    ('Firewalls', 'Networking'),
+    ('Wireshark', 'Networking'),
+    ('Linux', 'Networking'),
+
+    # Tools
+    ('Git', 'Tools'),
+    ('GitHub', 'Tools'),
+    ('VS Code', 'Tools'),
+    ('Postman', 'Tools'),
+    ('Figma', 'Tools'),
+    ('Jira', 'Tools'),
+]
+
+
+def seed_skill_catalog(conn):
+    """Insert seed skills into skill_catalog. Skips entries that already exist."""
+    conn.executemany(
+        "INSERT OR IGNORE INTO skill_catalog (name, category, is_seed) VALUES (?, ?, 1)",
+        [(name, category) for name, category in SKILL_SEED],
+    )
+    conn.commit()

@@ -22,6 +22,7 @@
       <nav class="tabs">
         <button class="tab active" data-page="tailor">Auto Tailor Resume</button>
         <button class="tab" data-page="apply">Auto Apply</button>
+        <button class="tab" data-page="config">Config</button>
       </nav>
     </div>
   </header>
@@ -114,6 +115,366 @@
 
       <div id="applyStatus" class="status"></div>
     </section>
+
+
+    <!-- ------------------------------------------------------------------------------------------------------------------------------- -->
+    <!-- PAGE 3: CONFIG -->
+    <section id="page-config" class="page">
+      <div class="card info-banner">
+        <span class="info-icon">⚙️</span>
+        <div>
+          <p class="banner-title">Configuration</p>
+          <p class="banner-text">Set up your AI model, skills, and profile data. These power the resume tailoring and form-filling agents.</p>
+          <div id="configStatus" class="status"></div>
+        </div>
+      </div>
+    
+      <!-- Model config -->
+      <div class="card">
+        <label>Model Configuration</label>
+        <div class="config-section" id="modelConfigSection">
+          <!-- model fields go here -->
+        </div>
+      </div>
+    
+      <!-- Skills -->
+      <!-- Skills -->
+      <div class="card">
+        <label>Skills</label>
+        <div class="config-section" id="skillsSection">
+
+          <!-- Search + filter row -->
+          <div class="skills-search-row">
+            <input
+              type="text"
+              id="skillSearch"
+              class="skills-search-input"
+              placeholder="Search skills..."
+              autocomplete="off"
+            />
+            <select id="skillCategoryFilter" class="skills-category-select">
+              <option value="">All categories</option>
+            </select>
+          </div>
+
+          <!-- Dropdown of matching catalog skills -->
+          <div id="skillDropdown" class="skill-dropdown hidden"></div>
+
+          
+
+          <!-- Selected skills as badges -->
+          <div id="userSkillsBadges" class="skills-badges"></div>
+
+          <button id="saveSkillsBtn" class="primary-btn" disabled>Save Skills</button>
+          <p class="file-status" id="skillsStatus">Loading skill catalog...</p>
+        </div>
+      </div>
+    
+      <!-- User profile -->
+      <!-- User profile -->
+      <div class="card">
+        <div class="profile-header">
+          <label>Profile</label>
+          <button id="profileEditBtn" class="secondary-btn profile-edit-btn">Edit</button>
+        </div>
+
+        <div class="config-section profile-view-mode" id="profileSection">
+
+          <!-- Personal -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Personal</h4>
+            <div class="profile-grid">
+              <div class="profile-field">
+                <span class="profile-field-label">First Name</span>
+                <span class="profile-field-value" data-field="first_name">—</span>
+                <input type="text" class="profile-field-input" data-field="first_name" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Middle Name</span>
+                <span class="profile-field-value" data-field="middle_name">—</span>
+                <input type="text" class="profile-field-input" data-field="middle_name" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Last Name</span>
+                <span class="profile-field-value" data-field="last_name">—</span>
+                <input type="text" class="profile-field-input" data-field="last_name" />
+              </div>
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Full Name</span>
+                <span class="profile-field-value" data-field="full_name">—</span>
+                <input type="text" class="profile-field-input" data-field="full_name" placeholder="As it should appear on applications" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Preferred Name</span>
+                <span class="profile-field-value" data-field="preferred_name">—</span>
+                <input type="text" class="profile-field-input" data-field="preferred_name" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Pronouns</span>
+                <span class="profile-field-value" data-field="pronouns">—</span>
+                <input type="text" class="profile-field-input" data-field="pronouns" placeholder="he/him, she/her, they/them" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Date of Birth</span>
+                <span class="profile-field-value" data-field="date_of_birth">—</span>
+                <input type="date" class="profile-field-input" data-field="date_of_birth" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Email</span>
+                <span class="profile-field-value" data-field="email">—</span>
+                <input type="email" class="profile-field-input" data-field="email" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Phone</span>
+                <span class="profile-field-value" data-field="phone">—</span>
+                <input type="tel" class="profile-field-input" data-field="phone" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Address</h4>
+            <div class="profile-grid">
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Street</span>
+                <span class="profile-field-value" data-field="street">—</span>
+                <input type="text" class="profile-field-input" data-field="street" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">City</span>
+                <span class="profile-field-value" data-field="city">—</span>
+                <input type="text" class="profile-field-input" data-field="city" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">State / Province</span>
+                <span class="profile-field-value" data-field="state_province">—</span>
+                <input type="text" class="profile-field-input" data-field="state_province" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Postal Code</span>
+                <span class="profile-field-value" data-field="postal_code">—</span>
+                <input type="text" class="profile-field-input" data-field="postal_code" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Country</span>
+                <span class="profile-field-value" data-field="country">—</span>
+                <input type="text" class="profile-field-input" data-field="country" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Links -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Links</h4>
+            <div class="profile-grid">
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">LinkedIn</span>
+                <span class="profile-field-value" data-field="linkedin">—</span>
+                <input type="url" class="profile-field-input" data-field="linkedin" />
+              </div>
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">GitHub</span>
+                <span class="profile-field-value" data-field="github">—</span>
+                <input type="url" class="profile-field-input" data-field="github" />
+              </div>
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Portfolio</span>
+                <span class="profile-field-value" data-field="portfolio">—</span>
+                <input type="url" class="profile-field-input" data-field="portfolio" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Authorization -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Work Authorization</h4>
+            <div class="profile-grid">
+              <div class="profile-field">
+                <span class="profile-field-label">Country</span>
+                <span class="profile-field-value" data-field="work_auth_country">—</span>
+                <input type="text" class="profile-field-input" data-field="work_auth_country" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Status</span>
+                <span class="profile-field-value" data-field="work_auth_status">—</span>
+                <input type="text" class="profile-field-input" data-field="work_auth_status" placeholder="Citizen, Permanent Resident, etc." />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Needs Sponsorship Now</span>
+                <span class="profile-field-value" data-field="requires_sponsorship_now" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="requires_sponsorship_now">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Needs Sponsorship Future</span>
+                <span class="profile-field-value" data-field="requires_sponsorship_future" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="requires_sponsorship_future">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Preferences</h4>
+            <div class="profile-grid">
+              <div class="profile-field">
+                <span class="profile-field-label">Desired Salary</span>
+                <span class="profile-field-value" data-field="desired_salary">—</span>
+                <input type="text" class="profile-field-input" data-field="desired_salary" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Currency</span>
+                <span class="profile-field-value" data-field="desired_salary_currency">—</span>
+                <input type="text" class="profile-field-input" data-field="desired_salary_currency" placeholder="CAD, USD..." />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Willing to Relocate</span>
+                <span class="profile-field-value" data-field="willing_to_relocate" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="willing_to_relocate">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Open to Travel</span>
+                <span class="profile-field-value" data-field="open_to_travel" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="open_to_travel">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Demographics -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Demographics (Voluntary)</h4>
+            <div class="profile-grid">
+              <div class="profile-field">
+                <span class="profile-field-label">Gender</span>
+                <span class="profile-field-value" data-field="gender">—</span>
+                <input type="text" class="profile-field-input" data-field="gender" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Race / Ethnicity</span>
+                <span class="profile-field-value" data-field="race_ethnicity">—</span>
+                <input type="text" class="profile-field-input" data-field="race_ethnicity" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Veteran Status</span>
+                <span class="profile-field-value" data-field="veteran_status">—</span>
+                <input type="text" class="profile-field-input" data-field="veteran_status" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Disability Status</span>
+                <span class="profile-field-value" data-field="disability_status">—</span>
+                <input type="text" class="profile-field-input" data-field="disability_status" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">LGBTQ</span>
+                <span class="profile-field-value" data-field="lgbtq">—</span>
+                <input type="text" class="profile-field-input" data-field="lgbtq" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Compliance -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Compliance</h4>
+            <div class="profile-grid">
+              <div class="profile-field">
+                <span class="profile-field-label">18 or Older</span>
+                <span class="profile-field-value" data-field="is_18_or_older" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="is_18_or_older">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Can Provide Work Documents</span>
+                <span class="profile-field-value" data-field="can_provide_work_documents" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="can_provide_work_documents">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Non-Compete Active</span>
+                <span class="profile-field-value" data-field="non_compete_active" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="non_compete_active">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Previously Employed Here</span>
+                <span class="profile-field-value" data-field="previously_employed_here" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="previously_employed_here">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Referred By</span>
+                <span class="profile-field-value" data-field="referred_by">—</span>
+                <input type="text" class="profile-field-input" data-field="referred_by" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Referral Source</span>
+                <span class="profile-field-value" data-field="referral_source">—</span>
+                <input type="text" class="profile-field-input" data-field="referral_source" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Open Questions -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Open Questions</h4>
+            <div class="profile-grid profile-grid-single">
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Why This Company</span>
+                <span class="profile-field-value profile-field-long" data-field="why_this_company">—</span>
+                <textarea class="profile-field-input" data-field="why_this_company" rows="3"></textarea>
+              </div>
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Why This Role</span>
+                <span class="profile-field-value profile-field-long" data-field="why_this_role">—</span>
+                <textarea class="profile-field-input" data-field="why_this_role" rows="3"></textarea>
+              </div>
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Greatest Strength</span>
+                <span class="profile-field-value profile-field-long" data-field="greatest_strength">—</span>
+                <textarea class="profile-field-input" data-field="greatest_strength" rows="3"></textarea>
+              </div>
+              <div class="profile-field profile-field-wide">
+                <span class="profile-field-label">Biggest Weakness</span>
+                <span class="profile-field-value profile-field-long" data-field="biggest_weakness">—</span>
+                <textarea class="profile-field-input" data-field="biggest_weakness" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save / Cancel (only shown in edit mode) -->
+          <div class="profile-actions">
+            <button id="profileSaveBtn" class="primary-btn">Save Profile</button>
+            <button id="profileCancelBtn" class="secondary-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- end of profile section -->
+      <!-- ------------------------------------------------------------------------------ -->
+    
+      <!-- <button id="saveConfigBtn" class="primary-btn">Save Configuration</button> -->
+      
+    </section>
+
   </main>
   
   <script src="{{ url_for('static', filename='vendor/jszip.min.js') }}"></script>

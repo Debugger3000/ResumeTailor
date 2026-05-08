@@ -295,5 +295,397 @@ function results(summary){
 }
 
 
+// ------------------------------------------------------------------------------------
+// Config page
+// write config page here
+
+// ------------------------------------------------------------------------------------
+// CONFIG PAGE
+// ------------------------------------------------------------------------------------
+
+const skillsStatus = document.getElementById('skillsStatus');
+// const saveConfigBtn = document.getElementById('saveConfigBtn');
+const configStatus = document.getElementById('configStatus');
+
+
+// Skills elements
+const skillSearch = document.getElementById('skillSearch');
+const skillCategoryFilter = document.getElementById('skillCategoryFilter');
+const skillDropdown = document.getElementById('skillDropdown');
+const userSkillsBadges = document.getElementById('userSkillsBadges');
+
+// Cached catalog of available skills (fetched once on page load)
+let skillCatalog = [];
+
+// User's skills as last loaded from server (baseline for comparison)
+let originalUserSkills = [];
+// User's currently selected skills (just names for now)
+let userSkills = [];
+
+// Const skills category list (matches what the seed file uses)
+const SKILL_CATEGORIES = [
+  'Language',
+  'Frontend',
+  'Backend',
+  'Mobile',
+  'Database',
+  'Cloud',
+  'DevOps',
+  'Architecture',
+  'Networking',
+  'Tools',
+];
+
+
+
+
+
+// Populate the category filter <select>
+function populateCategoryFilter() {
+  for (const cat of SKILL_CATEGORIES) {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    skillCategoryFilter.appendChild(opt);
+  }
+}
+
+
+// Load Skills Data
+// Skills catalog for skills dropdown list
+async function loadSkillCatalog() {
+  try {
+    const res = await fetch('/api/data/skills/catalog');
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    skillCatalog = await res.json();
+    console.log('Skill catalog loaded:', skillCatalog);
+    skillsStatus.textContent = `${skillCatalog.length} skills available.`;
+  } catch (err) {
+    console.log(err);
+    skillsStatus.textContent = 'Failed to load skill catalog: ' + err.message;
+    skillsStatus.className = 'status error';
+  }
+}
+
+async function loadUserSkills() {
+  try {
+    const res = await fetch('/api/data/skills');
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    const rows = await res.json();
+
+    // API returns full skill rows; we only need the names client-side
+    const names = rows.map(r => r.name);
+
+    originalUserSkills = [...names];      // immutable baseline
+    userSkills = [...names];              // working copy
+
+    console.log('User skills loaded:', userSkills);
+    renderBadges();
+    updateSaveButton();
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+// Filter the catalog by search term + category, return matching skills
+function getFilteredSkills() {
+  const term = skillSearch.value.trim().toLowerCase();
+  const cat = skillCategoryFilter.value;
+
+  // No search and no category? hide the dropdown
+  if (!term && !cat) return null;
+
+  return skillCatalog.filter(s => {
+    const matchesTerm = !term || s.name.toLowerCase().includes(term);
+    const matchesCat = !cat || s.category === cat;
+    return matchesTerm && matchesCat;
+  });
+}
+
+// Render the dropdown of matching skills
+function renderDropdown() {
+  const matches = getFilteredSkills();
+
+  if (matches === null) {
+    skillDropdown.classList.add('hidden');
+    skillDropdown.innerHTML = '';
+    return;
+  }
+
+  skillDropdown.classList.remove('hidden');
+
+  if (matches.length === 0) {
+    skillDropdown.innerHTML = '<div class="skill-dropdown-empty">No skills match.</div>';
+    return;
+  }
+
+  skillDropdown.innerHTML = '';
+  for (const skill of matches) {
+    const item = document.createElement('div');
+    const alreadyAdded = userSkills.includes(skill.name);
+    item.className = 'skill-dropdown-item' + (alreadyAdded ? ' disabled' : '');
+    item.innerHTML = `
+      <span>${skill.name}</span>
+      <span class="skill-cat">${skill.category || ''}</span>
+    `;
+    if (!alreadyAdded) {
+      item.addEventListener('click', () => addUserSkill(skill.name));
+    }
+    skillDropdown.appendChild(item);
+  }
+}
+
+// Render the user's selected skills as badges
+function renderBadges() {
+  userSkillsBadges.innerHTML = '';
+
+  if (userSkills.length === 0) {
+    userSkillsBadges.innerHTML = '<span class="skills-badges-empty">No skills added yet.</span>';
+    return;
+  }
+
+  for (const name of userSkills) {
+    const badge = document.createElement('span');
+    badge.className = 'skill-badge';
+    badge.innerHTML = `${name}<span class="remove" data-skill="${name}">×</span>`;
+    userSkillsBadges.appendChild(badge);
+  }
+
+  // Wire up remove buttons
+  userSkillsBadges.querySelectorAll('.remove').forEach(el => {
+    el.addEventListener('click', () => removeUserSkill(el.dataset.skill));
+  });
+}
+
+function addUserSkill(name) {
+  if (userSkills.includes(name)) return;
+  userSkills.push(name);
+  renderBadges();
+  renderDropdown();
+  updateSaveButton();
+}
+
+function removeUserSkill(name) {
+  userSkills = userSkills.filter(s => s !== name);
+  renderBadges();
+  renderDropdown();
+  updateSaveButton();
+}
+
+// Wire up search/filter inputs
+skillSearch.addEventListener('input', renderDropdown);
+skillCategoryFilter.addEventListener('change', renderDropdown);
+
+// Hide dropdown when clicking outside the skills section
+document.addEventListener('click', (e) => {
+  const section = document.getElementById('skillsSection');
+  if (section && !section.contains(e.target)) {
+    skillDropdown.classList.add('hidden');
+  }
+});
+
+// Re-show dropdown when focusing search again (if it has content)
+skillSearch.addEventListener('focus', renderDropdown);
+
+
+
+const saveSkillsBtn = document.getElementById('saveSkillsBtn');
+
+function skillsChanged() {
+  if (userSkills.length !== originalUserSkills.length) return true;
+  // Order-independent comparison via sorted join
+  const a = [...userSkills].sort().join('|');
+  const b = [...originalUserSkills].sort().join('|');
+  return a !== b;
+}
+
+function updateSaveButton() {
+  saveSkillsBtn.disabled = !skillsChanged();
+}
+
+saveSkillsBtn.addEventListener('click', async () => {
+  if (!skillsChanged()) return;
+
+  const original = saveSkillsBtn.innerHTML;
+  saveSkillsBtn.disabled = true;
+  saveSkillsBtn.innerHTML = '<span class="spinner"></span><span>Saving...</span>';
+
+  try {
+    const res = await fetch('/api/data/skills', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skills: userSkills }),
+    });
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+
+    // Sync baseline to current — button greys out again
+    originalUserSkills = [...userSkills];
+    updateSaveButton();
+    // skillsStatus.textContent = `Skills Saved.`;
+    configStatus.textContent = `Skills Saved.`;
+  } catch (err) {
+    console.log('Save failed:', err);
+  } finally {
+    saveSkillsBtn.innerHTML = original;
+    updateSaveButton(); // re-evaluate disabled state
+  }
+});
+
+// Model form field first
+
+// User data form
+
+// Init
+populateCategoryFilter();
+renderBadges();
+loadSkillCatalog();
+loadUserSkills();
+
+// Model form field first
+
+// Skills form list
+
+// User data form
+
+// ------------------------------------------------------------------------------------
+// PROFILE
+// ------------------------------------------------------------------------------------
+
+const profileSection = document.getElementById('profileSection');
+const profileEditBtn = document.getElementById('profileEditBtn');
+const profileSaveBtn = document.getElementById('profileSaveBtn');
+const profileCancelBtn = document.getElementById('profileCancelBtn');
+
+// Last-loaded profile (used to revert on cancel)
+let originalProfile = {};
+
+// All boolean field names — used to format Yes/No in view mode
+const PROFILE_BOOL_FIELDS = new Set([
+  'requires_sponsorship_now',
+  'requires_sponsorship_future',
+  'willing_to_relocate',
+  'open_to_travel',
+  'is_18_or_older',
+  'can_provide_work_documents',
+  'non_compete_active',
+  'previously_employed_here',
+]);
+
+async function loadProfile() {
+  try {
+    const res = await fetch('/api/data/profile');
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    const data = await res.json();
+    originalProfile = data || {};
+    renderProfile(originalProfile);
+  } catch (err) {
+    console.log('Failed to load profile:', err);
+  }
+}
+
+// Push values into both the spans (view) and inputs (edit)
+function renderProfile(data) {
+  const valueEls = profileSection.querySelectorAll('.profile-field-value');
+  const inputEls = profileSection.querySelectorAll('.profile-field-input');
+
+  valueEls.forEach(el => {
+    const key = el.dataset.field;
+    const raw = data[key];
+
+    if (raw === null || raw === undefined || raw === '') {
+      el.textContent = '';
+      el.classList.add('empty');
+    } else if (PROFILE_BOOL_FIELDS.has(key)) {
+      el.textContent = Number(raw) === 1 ? 'Yes' : 'No';
+      el.classList.remove('empty');
+    } else {
+      el.textContent = raw;
+      el.classList.remove('empty');
+    }
+  });
+
+  inputEls.forEach(el => {
+    const key = el.dataset.field;
+    const raw = data[key];
+    if (PROFILE_BOOL_FIELDS.has(key)) {
+      el.value = String(Number(raw) || 0);
+    } else {
+      el.value = raw ?? '';
+    }
+  });
+}
+
+// Read current input values back into a flat object
+function collectProfileForm() {
+  const out = {};
+  profileSection.querySelectorAll('.profile-field-input').forEach(el => {
+    const key = el.dataset.field;
+    let val = el.value;
+    if (PROFILE_BOOL_FIELDS.has(key)) {
+      val = Number(val) === 1 ? 1 : 0;
+    } else {
+      val = val.trim();
+    }
+    out[key] = val;
+  });
+  return out;
+}
+
+function setProfileMode(mode) {
+  // mode: 'view' or 'edit'
+  profileSection.classList.toggle('profile-view-mode', mode === 'view');
+  profileSection.classList.toggle('profile-edit-mode', mode === 'edit');
+  profileEditBtn.classList.toggle('hidden', mode === 'edit');
+}
+
+profileEditBtn.addEventListener('click', () => {
+  setProfileMode('edit');
+});
+
+profileCancelBtn.addEventListener('click', () => {
+  // Revert inputs to last loaded values
+  renderProfile(originalProfile);
+  setProfileMode('view');
+});
+
+profileSaveBtn.addEventListener('click', async () => {
+  const payload = collectProfileForm();
+
+  const original = profileSaveBtn.innerHTML;
+  profileSaveBtn.disabled = true;
+  profileSaveBtn.innerHTML = '<span class="spinner"></span><span>Saving...</span>';
+
+  try {
+    const res = await fetch('/api/data/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+
+    originalProfile = payload;
+    renderProfile(originalProfile);
+    setProfileMode('view');
+    // console.log('Profile saved.');
+    configStatus.textContent = `Profile Saved.`;
+  } catch (err) {
+    console.log('Profile save failed:', err);
+  } finally {
+    profileSaveBtn.innerHTML = original;
+    profileSaveBtn.disabled = false;
+  }
+});
+
+// Init in view mode
+setProfileMode('view');
+loadProfile();
+
+
+
+
+
+
+
 // setup lucide icons
 lucide.createIcons();

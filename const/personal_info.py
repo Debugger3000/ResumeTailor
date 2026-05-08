@@ -39,7 +39,6 @@ PROFILE = {
         "requires_sponsorship_now": False,
         "requires_sponsorship_future": False,
         "authorized_countries": ["Canada"],
-        "notes": "Authorized to work in Canada and the US under USMCA TN status.",
     },
 
     "preferences": {

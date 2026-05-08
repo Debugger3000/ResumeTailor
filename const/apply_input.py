@@ -93,11 +93,30 @@ inputs_field_schema = {
 # - Do NOT invent information that is not in the profile. For required fields with no matching profile data, still leave the value empty — do not fabricate answers.
 
 
+
+
+# profile field looks like:
+# {
+#     "first_name": "John",
+#     "last_name": "Doe",
+#     "email": "john.doe@example.com",
+#     # ...all profile fields at top level...
+#     "experience": [
+#         {"company": "Acme", "title": "Senior Engineer", ...},
+#         {"company": "Globex", "title": "Engineer", ...},
+#     ],
+#     "skills": ["Python", "TypeScript", "PostgreSQL", ...],
+# }
+
+
+
 POPULATE_FIELDS_PROMPT = """You fill in job application form fields using the user's profile data.
 
 You receive: {"profile": {...}, "fields": [...]}
 
-Each field:
+
+
+fields field looks like:
 {
   "agent_id": "field-3",
   "kind": "text|email|tel|textarea|number|url|select|radio|checkbox",

@@ -374,6 +374,211 @@ textarea:focus, input:focus { border-color: #6366f1; }
 
 
 
+/* SKILLS CONFIG */
+.skills-search-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.skills-search-input {
+  flex: 1;
+  background: #020617;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.skills-search-input:focus { border-color: #6366f1; }
+
+.skills-category-select {
+  background: #020617;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  min-width: 150px;
+  transition: border-color 0.2s;
+}
+.skills-category-select:focus { border-color: #6366f1; }
+
+.skill-dropdown {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+.skill-dropdown-item {
+  padding: 9px 14px;
+  font-size: 13px;
+  color: #e2e8f0;
+  cursor: pointer;
+  border-bottom: 1px dashed #1e293b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+.skill-dropdown-item:last-child { border-bottom: none; }
+.skill-dropdown-item:hover { background: #1e1b4b; }
+.skill-dropdown-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.skill-dropdown-item .skill-cat {
+  font-size: 11px;
+  color: #64748b;
+  font-family: 'DM Mono', monospace;
+}
+.skill-dropdown-empty {
+  padding: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.skills-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  min-height: 28px;
+}
+.skill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #312e81;
+  color: #c7d2fe;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.skill-badge .remove {
+  cursor: pointer;
+  color: #a5b4fc;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.skill-badge .remove:hover { opacity: 1; }
+.skills-badges-empty {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* PROFILE CONFIG */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.profile-edit-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.profile-group {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #1e293b;
+}
+.profile-group:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.profile-group-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: #a5b4fc;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+.profile-grid-single { grid-template-columns: 1fr; }
+.profile-field-wide { grid-column: 1 / -1; }
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.profile-field-label {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+.profile-field-value {
+  font-size: 13px;
+  color: #e2e8f0;
+  padding: 8px 0;
+  word-break: break-word;
+  min-height: 17px;
+}
+.profile-field-value:empty::before,
+.profile-field-value.empty::before {
+  content: '—';
+  color: #475569;
+}
+.profile-field-long {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.profile-field-input {
+  width: 100%;
+  background: #020617;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.profile-field-input:focus { border-color: #6366f1; }
+textarea.profile-field-input { resize: vertical; min-height: 60px; }
+
+/* Mode toggling — the heart of the view/edit pattern */
+.profile-view-mode .profile-field-input { display: none; }
+.profile-view-mode .profile-actions { display: none; }
+
+.profile-edit-mode .profile-field-value { display: none; }
+.profile-edit-mode .profile-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #1e293b;
+}
+
+
 
 /* animations */
 
