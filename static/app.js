@@ -30,7 +30,7 @@ const tailorStatus = document.getElementById('tailorStatus');
 const resultCard = document.getElementById('resultCard');
 const scoreValue = document.getElementById('scoreValue');
 const downloadLink = document.getElementById('downloadLink');
-const goToApplyBtn = document.getElementById('goToApplyBtn');
+// const goToApplyBtn = document.getElementById('goToApplyBtn');
 const previewContainer = document.getElementById('docx-preview-container');
 const modelSummary = document.getElementById('modelSummary');
 const changesCount = document.getElementById('changesCount');
@@ -51,10 +51,16 @@ tailorBtn.addEventListener('click', async () => {
   formData.append('job_description', jobDesc.value);
   formData.append('resume', resumeFile.files[0]);
 
+  
+  const originalBtnContent = tailorBtn.innerHTML;
   tailorBtn.disabled = true;
-  tailorStatus.textContent = 'Tailoring...';
-  tailorStatus.className = 'status';
+  tailorBtn.innerHTML = '<span class="spinner"></span><span>Tailoring Resume...</span>';
+  tailorBtn.classList.add('loading');
+
+  // tailorStatus.textContent = 'Tailoring...';
+  // tailorStatus.className = 'status';
   resultCard.classList.add('hidden');  // Hide previous result while working
+
 
   try {
     const res = await fetch('/api/tailor', { method: 'POST', body: formData });
@@ -83,7 +89,7 @@ tailorBtn.addEventListener('click', async () => {
     state.sessionId = data.session_id;
     state.tailoredResumePath = data.download_url;
     state.jobDescription = jobDesc.value;
-    updateResumeStatus();
+    // updateResumeStatus();
 
     tailorStatus.textContent = 'Done. Review the preview below.';
     tailorStatus.className = 'status success';
@@ -93,6 +99,8 @@ tailorBtn.addEventListener('click', async () => {
     tailorStatus.className = 'status error';
   } finally {
     tailorBtn.disabled = false;
+    tailorBtn.innerHTML = originalBtnContent;
+    tailorBtn.classList.remove('loading');
   }
 });
 
@@ -123,20 +131,20 @@ async function renderDocxPreview(url) {
 
 // ---------------------------
 
-goToApplyBtn.addEventListener('click', () => switchPage('apply'));
+// goToApplyBtn.addEventListener('click', () => switchPage('apply'));
 
 // ========== APPLY PAGE ==========
 const appUrl = document.getElementById('appUrl');
 const startAgentBtn = document.getElementById('startAgentBtn');
 const beginBtn = document.getElementById('beginBtn');
 const resumeDot = document.getElementById('resumeDot');
-const resumeReadyText = document.getElementById('resumeReadyText');
+// const resumeReadyText = document.getElementById('resumeReadyText');
 const agentLog = document.getElementById('agentLog');
 const logEntries = document.getElementById('logEntries');
 const confirmBox = document.getElementById('confirmBox');
 const confirmText = document.getElementById('confirmText');
-const approveBtn = document.getElementById('approveBtn');
-const rejectBtn = document.getElementById('rejectBtn');
+// const approveBtn = document.getElementById('approveBtn');
+// const rejectBtn = document.getElementById('rejectBtn');
 const applyStatus = document.getElementById('applyStatus');
 
 // function updateResumeStatus() {
@@ -169,10 +177,10 @@ startAgentBtn.addEventListener('click', async () => {
 
   agentLog.classList.remove('hidden');
   logEntries.innerHTML = '';
-  addLog('Starting agent...', 'action');
+  addLog('Launching browswer...', 'action');
   startAgentBtn.disabled = true;
   applyStatus.className = 'status';
-  applyStatus.textContent = 'Agent is working...';
+  applyStatus.textContent = 'Browser activating...';
 
   try {
     const res = await fetch('/api/apply/start', {
@@ -193,8 +201,8 @@ startAgentBtn.addEventListener('click', async () => {
     addLog(data.message || 'Awaiting first step...', 'action');
 
     beginBtn.classList.remove('hidden');
-
-    // Stub: real flow would stream agent actions via SSE or polling
+    applyStatus.textContent = 'Browser running...';
+    startAgentBtn.classList.add('hidden'); // make sure start browser button is hidden after...
     
   } catch (err) {
     addLog('Error: ' + err.message, 'warning');
@@ -213,28 +221,40 @@ beginBtn.addEventListener('click', async () => {
 
   console.log("Begin button clcked....222222222222");
 
+  // Save original button content and show loading state
+  const originalBtnContent = beginBtn.innerHTML;
   beginBtn.disabled = true;
-  addLog('Beginning agent on current page...', 'action');
+  beginBtn.innerHTML = '<span class="spinner"></span><span>Filling forms...</span>';
+  beginBtn.classList.add('loading');
+
+  addLog('Agent filling forms on current page...', 'action');
 
   try {
-    const res = await fetch('/api/apply/begin', {
+    const res = await fetch('/api/apply/fillform', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: state.sessionId }),
     });
     const data = await res.json();
 
-    
+    addLog('Page forms have been filled', 'success');
+    addLog(`Time Elapsed: ${data.time_elapsed}`, 'action');
+    console.log('Retruned data after fill forms:', data);
 
-    addLog('Page data received', 'success');
-    console.log('Pages form fields', data.populated_fields);
-    // Next step: render what the agent saw, show confirm box, etc.
+    // show model summary of results
+    // fields: filled, skipped, errors
+    const agentSummary = results(data.summary);
+    addLog(`Form Fields: ${agentSummary}`, 'action');
 
-    confirmText.textContent = 'Backend stub — implement agent polling / SSE here.';
-    confirmBox.classList.remove('hidden');
+    // confirmText.textContent = agentSummary;
+    // confirmBox.classList.remove('hidden');
   } catch (err) {
     addLog('Begin failed: ' + err.message, 'warning');
+  } finally {
+    // Restore button (use finally so it always runs, even on error)
     beginBtn.disabled = false;
+    beginBtn.innerHTML = originalBtnContent;
+    beginBtn.classList.remove('loading');
   }
 });
 
@@ -242,20 +262,38 @@ beginBtn.addEventListener('click', async () => {
 // ------
 // Continue applying with agent button
 // -----
-approveBtn.addEventListener('click', async () => {
-  addLog('User approved — continuing to next step', 'success');
-  confirmBox.classList.add('hidden');
-  // TODO: POST /api/apply/continue
-});
+// approveBtn.addEventListener('click', async () => {
+//   addLog('User approved — continuing to next step', 'success');
+//   confirmBox.classList.add('hidden');
+
+// });
 
 
 // ------
 // Stop applying with agent button
 // -----
-rejectBtn.addEventListener('click', async () => {
-  addLog('User stopped the agent', 'warning');
-  confirmBox.classList.add('hidden');
-  startAgentBtn.disabled = false;
-  applyStatus.textContent = 'Agent stopped by user.';
-  // TODO: POST /api/apply/stop
-});
+// rejectBtn.addEventListener('click', async () => {
+//   addLog('User stopped the agent', 'warning');
+//   confirmBox.classList.add('hidden');
+//   startAgentBtn.disabled = false;
+//   applyStatus.textContent = 'Agent stopped by user.';
+
+// });
+
+
+
+// results = {"filled": 0, "skipped": 0, "errors": []}
+
+
+function results(summary){
+    const resultString = `
+      Filled: ${summary.filled}\n
+      Skipped: ${summary.skipped}\n
+      Errors: ${summary.errors.length}
+    `
+    return resultString;
+}
+
+
+// setup lucide icons
+lucide.createIcons();

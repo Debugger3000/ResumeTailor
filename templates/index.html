@@ -3,24 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <title>JobPilot</title>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
 </head>
 <body>
   <header class="app-header">
     <div class="header-inner">
       <div class="brand">
-        <span class="brand-icon">⚡</span>
-        <h1>JobPilot</h1>
-        <span class="badge">LOCAL AI</span>
+        <!-- <span class="brand-icon">⚡</span> -->
+         <div id="app-title">
+          <i data-lucide="wand-2" class="lucide-icon" id="brand-icon"></i>
+          <h1>Job Auto</h1>
+         </div>
+        
+        <span class="badge">Form Agent</span>
       </div>
       <nav class="tabs">
-        <button class="tab active" data-page="tailor">Tailor Resume</button>
+        <button class="tab active" data-page="tailor">Auto Tailor Resume</button>
         <button class="tab" data-page="apply">Auto Apply</button>
       </nav>
     </div>
   </header>
 
   <main>
+    <!-- ------------------------------------------------------------------------------------------------------------------------------- -->
     <!-- PAGE 1: TAILOR -->
   <section id="page-tailor" class="page active">
     <div class="card">
@@ -36,7 +43,7 @@
       </div>
     </div>
 
-    <button id="tailorBtn" class="primary-btn">⚡ Tailor My Resume</button>
+    <button id="tailorBtn" class="primary-btn">Tailor My Resume</button>
 
     <div id="tailorStatus" class="status"></div>
 
@@ -53,8 +60,8 @@
       </div>
 
       <div class="action-row">
-        <a id="downloadLink" class="primary-btn" download>↓ Download .docx</a>
-        <button id="goToApplyBtn" class="secondary-btn">Next: Apply →</button>
+        <a id="downloadLink" class="primary-btn" download>Download</a>
+        <!-- <button id="goToApplyBtn" class="secondary-btn">Next: Apply →</button> -->
       </div>
 
       <h2>Preview</h2>
@@ -62,6 +69,7 @@
     </section>
   </section>
 
+    <!-- ------------------------------------------------------------------------------------------------------------------------------- -->
     <!-- PAGE 2: APPLY -->
     <section id="page-apply" class="page">
       <div class="card info-banner">
@@ -77,15 +85,15 @@
         <input type="url" id="appUrl" placeholder="https://jobs.company.com/apply/..." />
       </div>
 
-      <div class="card">
+      <!-- <div class="card">
         <label>Resume to Upload</label>
         <div class="resume-status" id="resumeReadyStatus">
           <span class="status-dot" id="resumeDot"></span>
           <span id="resumeReadyText">No tailored resume yet — tailor one first</span>
         </div>
-      </div>
+      </div> -->
 
-      <button id="startAgentBtn" class="primary-btn">Start Agent</button>
+      <button id="startAgentBtn" class="primary-btn">Launch Browser</button>
 
       <section class="card agent-log hidden" id="agentLog">
         <h2>Agent Activity</h2>
@@ -93,13 +101,13 @@
         <div id="logEntries" class="log-entries"></div>
 
         <!-- Begin applying with agent on first page -->
-        <button id="beginBtn" class="primary-btn hidden">▶ Begin</button>
+        <button id="beginBtn" class="primary-btn hidden">Fill Form</button>
 
         <div class="confirm-box hidden" id="confirmBox">
           <p id="confirmText">Agent is waiting for your review.</p>
           <div class="action-row">
-            <button id="approveBtn" class="primary-btn">✓ Approve & Continue</button>
-            <button id="rejectBtn" class="secondary-btn">✗ Stop</button>
+            <!-- <button id="approveBtn" class="primary-btn">✓ Approve & Continue</button>
+            <button id="rejectBtn" class="secondary-btn">✗ Stop</button> -->
           </div>
         </div>
       </section>
@@ -110,6 +118,7 @@
   
   <script src="{{ url_for('static', filename='vendor/jszip.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/docx-preview.min.js') }}"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

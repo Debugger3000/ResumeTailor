@@ -48,7 +48,7 @@ async def apply_start():
     })
 
 # Begin applying with agent
-@apply_bp.route('/begin', methods=['POST'])
+@apply_bp.route('/fillform', methods=['POST'])
 async def apply_begin():
     print("begin hit")
 
@@ -72,8 +72,13 @@ async def apply_begin():
 
     filtered_fields = filter_fields(fields)
     print(f"fields returned:\n {fields}")
+
+    # Model populates values of fields
+    # -----------------------
     # give model fields data, so it can populate it with user data
-    populated_fields = await populate_field_values(filtered_fields)
+    populated_fields, elapsed = await populate_field_values(filtered_fields)
+
+
     # pass populated_fields and sessions page to be filled with data
     summary = await fill_fields(page, populated_fields)
 
@@ -84,48 +89,49 @@ async def apply_begin():
     return jsonify({
         'fields': populated_fields,
         'summary': summary,
+        'time_elapsed': elapsed,
     })
 
 
-@apply_bp.route('/continue', methods=['POST'])
-async def apply_continue():
-    data = await request.get_json()
-    session = manager.get(data['session_id'])
-    if not session:
-        return jsonify({'error': 'unknown session'}), 404
+# @apply_bp.route('/continue', methods=['POST'])
+# async def apply_continue():
+#     data = await request.get_json()
+#     session = manager.get(data['session_id'])
+#     if not session:
+#         return jsonify({'error': 'unknown session'}), 404
 
-    # session.page is a live Page — agent can interact with it
-    # e.g. await session.page.click(...), await session.page.fill(...)
-    # await agent.step(session)
+#     # session.page is a live Page — agent can interact with it
+#     # e.g. await session.page.click(...), await session.page.fill(...)
+#     # await agent.step(session)
 
-    return jsonify({'status': 'ok'})
-
-
-@apply_bp.route('/stop', methods=['POST'])
-async def apply_stop():
-    data = await request.get_json()
-    await manager.close_session(data['session_id'])
-    return jsonify({'status': 'stopped'})
+#     return jsonify({'status': 'ok'})
 
 
+# @apply_bp.route('/stop', methods=['POST'])
+# async def apply_stop():
+#     data = await request.get_json()
+#     await manager.close_session(data['session_id'])
+#     return jsonify({'status': 'stopped'})
 
-@apply_bp.route('/advance', methods=['POST'])
-async def apply_advance():
-    """Click Continue/Submit on the current page and report what happened."""
-    session = manager.current
-    if not session:
-        return jsonify({'error': 'no active session'}), 400
+
+
+# @apply_bp.route('/advance', methods=['POST'])
+# async def apply_advance():
+#     """Click Continue/Submit on the current page and report what happened."""
+#     session = manager.current
+#     if not session:
+#         return jsonify({'error': 'no active session'}), 400
     
-    page = await resolve_active_page(session)
-    advanced = await click_continue(page)
+#     page = await resolve_active_page(session)
+#     advanced = await click_continue(page)
     
-    if advanced:
-        # Re-resolve in case the click opened a new tab
-        page = await resolve_active_page(session)
-        await wait_for_page_ready(page)
-        session.last_known_page = page
+#     if advanced:
+#         # Re-resolve in case the click opened a new tab
+#         page = await resolve_active_page(session)
+#         await wait_for_page_ready(page)
+#         session.last_known_page = page
     
-    return jsonify({
-        'advanced': advanced,
-        'url': page.url,
-    })
+#     return jsonify({
+#         'advanced': advanced,
+#         'url': page.url,
+#     })

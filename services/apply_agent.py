@@ -49,7 +49,7 @@ POPULATE_FIELDS_SCHEMA = {
 }
 
 
-async def populate_field_values(fields: list[dict]) -> list[dict]:
+async def populate_field_values(fields: list[dict]) -> tuple[list[dict], float]:
     """
     Given the extracted form fields, ask the model to populate each field's
     `value` based on the user's profile. Returns the fields list with values filled.
@@ -76,6 +76,7 @@ async def populate_field_values(fields: list[dict]) -> list[dict]:
     raw_content = response['message']['content']
     print(f"=== populate_field_values returned in {elapsed:.1f}s ===")
     print(f"=== RAW OUTPUT: {raw_content[:2000]} ===")
+
 
     try:
         parsed = json.loads(raw_content)
@@ -104,4 +105,4 @@ async def populate_field_values(fields: list[dict]) -> list[dict]:
     #     print(f"=== WARNING: agent_id mismatch. missing={missing} extra={extra} ===")
 
     print(f"=== Populated {sum(1 for f in merged if f.get('value'))} of {len(merged)} fields ===")
-    return merged
+    return merged, elapsed
