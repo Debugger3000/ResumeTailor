@@ -57,7 +57,7 @@ def get_full_user_data() -> dict:
     suitable for passing to the model.
     """
     return {
-        **get_user_profile(),         # spread profile keys at top level
+        "profile": get_user_profile(),         # spread profile keys at top level
         "experience": get_work_experience(),
         "skills": get_user_skills(),
     }

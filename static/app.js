@@ -684,8 +684,579 @@ loadProfile();
 
 
 
+// ============================================================
+// MODEL CONFIG — Local tab (Ollama)
+// ============================================================
+
+// ============================================================
+// MODEL CATALOG
+// Every entry mirrors the server schema:
+//   { provider, model_name, host, api_key_env, category, desc }
+// `host` is the default; user can override.
+// `api_key_env` is the conventional env var name for that provider.
+// ============================================================
+
+const MODEL_CATALOG = [
+  // ============== OLLAMA (local) ==============
+  // host defaults to local daemon, no api key needed
+  { provider: 'ollama', model_name: 'llama3.2',          host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.2 — small, fast, great default' },
+  { provider: 'ollama', model_name: 'llama3.2:1b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.2 1B' },
+  { provider: 'ollama', model_name: 'llama3.2:3b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.2 3B' },
+  { provider: 'ollama', model_name: 'llama3.1',          host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 — workhorse, tool-calling' },
+  { provider: 'ollama', model_name: 'llama3.1:8b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 8B' },
+  { provider: 'ollama', model_name: 'llama3.1:70b',      host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 70B' },
+  { provider: 'ollama', model_name: 'llama3.1:405b',     host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 405B' },
+  { provider: 'ollama', model_name: 'llama3.3:70b',      host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Llama 3.3 70B — ~405B quality at 70B' },
+  { provider: 'ollama', model_name: 'llama4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Llama 4 — MoE, multimodal' },
+
+  { provider: 'ollama', model_name: 'qwen2.5',           host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 — strong all-rounder, 128K ctx' },
+  { provider: 'ollama', model_name: 'qwen2.5:7b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 7B' },
+  { provider: 'ollama', model_name: 'qwen2.5:14b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 14B' },
+  { provider: 'ollama', model_name: 'qwen2.5:32b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 32B' },
+  { provider: 'ollama', model_name: 'qwen2.5:72b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 72B' },
+  { provider: 'ollama', model_name: 'qwen3',             host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3 — tools + thinking modes' },
+  { provider: 'ollama', model_name: 'qwen3:8b',          host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3 8B' },
+  { provider: 'ollama', model_name: 'qwen3:32b',         host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3 32B' },
+  { provider: 'ollama', model_name: 'qwen3.6:27b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3.6 27B — newest Qwen dense' },
+
+  { provider: 'ollama', model_name: 'gemma3',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 — vision, single-GPU friendly' },
+  { provider: 'ollama', model_name: 'gemma3:4b',         host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 4B' },
+  { provider: 'ollama', model_name: 'gemma3:12b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 12B' },
+  { provider: 'ollama', model_name: 'gemma3:27b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 27B' },
+  { provider: 'ollama', model_name: 'gemma4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 4 — Google, vision + tools' },
+
+  // ============== ANTHROPIC ==============
+  { provider: 'anthropic', model_name: 'claude-opus-4-7',         host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Opus 4.7 — most capable' },
+  { provider: 'anthropic', model_name: 'claude-sonnet-4-6',       host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Sonnet 4.6 — balanced' },
+  { provider: 'anthropic', model_name: 'claude-haiku-4-5',        host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Haiku 4.5 — fast & cheap' },
+
+  // ============== OPENAI ==============
+  { provider: 'openai',    model_name: 'gpt-5',                   host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-5 — flagship' },
+  { provider: 'openai',    model_name: 'gpt-5-mini',              host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-5 Mini — fast & cheap' },
+  { provider: 'openai',    model_name: 'gpt-4o',                  host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-4o — multimodal' },
+
+  // ============== GOOGLE ==============
+  { provider: 'google',    model_name: 'gemini-2.5-pro',          host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud · Google', desc: 'Gemini 2.5 Pro — flagship' },
+  { provider: 'google',    model_name: 'gemini-2.5-flash',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud · Google', desc: 'Gemini 2.5 Flash — fast' },
+];
+
+const PROVIDER_NEEDS_KEY = (provider) => provider !== 'ollama';
+let currentModelConfig = null;   // module-level cache of the saved row
 
 
+// ---------- Helpers ----------
+function findCatalogEntry(modelName) {
+  return MODEL_CATALOG.find(m => m.model_name === modelName);
+}
+
+function getActiveTab() {
+  const active = document.querySelector('.model-tab.active');
+  return active ? active.dataset.tab : 'local';
+}
+
+function getCurrentEntry() {
+  // Returns { provider, model_name, host, api_key_env } for whatever's selected,
+  // resolving custom inputs against the active tab.
+  const tab    = getActiveTab();
+  const select = document.getElementById('modelSelect');
+  const value  = select.value;
+
+  // Custom-entered model name
+  if (value === '__custom__') {
+    const customName = document.getElementById('customModelInput').value.trim();
+    return {
+      provider: tab === 'local' ? 'ollama' : null,   // user must pick provider on cloud tab
+      model_name: customName,
+      host: tab === 'local' ? 'http://localhost:11434' : null,
+      api_key_env: null,
+    };
+  }
+
+  return findCatalogEntry(value) || null;
+}
+
+// ---------- Validation ----------
+const MODEL_ID_RE = /^[a-zA-Z0-9._\-\/]+(?::[a-zA-Z0-9._\-]+)?$/;
+
+function validateAndToggleSave() {
+  const saveBtn = document.getElementById('saveModelBtn');
+  const entry   = getCurrentEntry();
+
+  if (!entry || !entry.model_name || !MODEL_ID_RE.test(entry.model_name)) {
+    saveBtn.disabled = true;
+    return;
+  }
+
+  // Cloud providers need an API key in the input
+  if (PROVIDER_NEEDS_KEY(entry.provider)) {
+    const apiKey = document.getElementById('apiKeyInput')?.value.trim();
+    if (!apiKey) {
+      saveBtn.disabled = true;
+      return;
+    }
+  }
+
+  saveBtn.disabled = false;
+}
+
+// Post model info
+// --------------------------------------
+// ---------- Save ----------
+async function saveModelConfig() {
+  const saveBtn = document.getElementById('saveModelBtn');
+  const status  = document.getElementById('modelStatus');
+  const entry   = getCurrentEntry();
+
+  if (!entry) return;
+
+  // Allow user-overridden host (port-only or full URL)
+  const hostInput = document.getElementById('ollamaHost');
+  const host = hostInput?.value.trim() || entry.host;
+
+  const payload = {
+    provider:    entry.provider,
+    model_name:  entry.model_name,
+    host:        host,
+    api_key_env: entry.api_key_env,   // env var NAME, not the key itself
+  };
+
+  // For cloud, the actual API key gets sent alongside (server stores it in env / vault,
+  // and writes the env-var name to the DB)
+  if (PROVIDER_NEEDS_KEY(entry.provider)) {
+    payload.api_key = document.getElementById('apiKeyInput').value.trim();
+  }
+
+  saveBtn.disabled = true;
+  status.textContent = 'Saving…';
+  status.className = 'status';
+
+  try {
+    const res = await fetch('/api/data/model', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    status.textContent = `Saved: ${entry.model_name}`;
+    status.className = 'status success';
+  } catch (err) {
+    status.textContent = `Save failed: ${err.message}`;
+    status.className = 'status error';
+  } finally {
+    validateAndToggleSave();
+  }
+}
+
+function populateModelSelect(tab = 'local') {
+  const select = document.getElementById('modelSelect');
+
+  // Filter catalog by the active tab
+  const filtered = MODEL_CATALOG.filter(m =>
+    tab === 'local' ? m.provider === 'ollama' : m.provider !== 'ollama'
+  );
+
+  // Group by category
+  const groups = {};
+  for (const m of filtered) (groups[m.category] ||= []).push(m);
+
+  // Wipe existing dynamic options (keep placeholder + custom)
+  select.querySelectorAll('optgroup, option:not([value=""]):not([value="__custom__"])').forEach(n => n.remove());
+  const customOpt = select.querySelector('option[value="__custom__"]');
+
+  for (const [cat, items] of Object.entries(groups)) {
+    const og = document.createElement('optgroup');
+    og.label = cat;
+    for (const m of items) {
+      const opt = document.createElement('option');
+      opt.value = m.model_name;
+      opt.textContent = `${m.model_name}  —  ${m.desc}`;
+      opt.dataset.desc = m.desc;
+      og.appendChild(opt);
+    }
+    select.insertBefore(og, customOpt);
+  }
+
+  // Reset select to placeholder when switching tabs
+  select.value = '';
+}
+
+
+function initModelTabs() {
+  document.querySelectorAll('.model-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll('.model-tab').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.model-tab-panel').forEach(p => {
+        p.classList.toggle('hidden', p.id !== `modelTab-${target}`);
+      });
+
+      // Refresh dropdown for the active tab
+      populateModelSelect(target);
+
+      // Show/hide API key row based on tab
+      const apiKeyRow = document.getElementById('apiKeyRow');
+      if (apiKeyRow) apiKeyRow.classList.toggle('hidden', target === 'local');
+
+      // Reset description + custom
+      document.getElementById('modelDescription').textContent = '';
+      document.getElementById('customModelRow').classList.add('hidden');
+      validateAndToggleSave();
+    });
+  });
+}
+
+function initModelConfig() {
+  populateModelSelect('local');
+  initModelTabs();
+
+  const select       = document.getElementById('modelSelect');
+  const customRow    = document.getElementById('customModelRow');
+  const customInput  = document.getElementById('customModelInput');
+  const description  = document.getElementById('modelDescription');
+  const saveBtn      = document.getElementById('saveModelBtn');
+  const hostInput    = document.getElementById('ollamaHost');
+  const apiKeyInput  = document.getElementById('apiKeyInput');
+
+  select.addEventListener('change', () => {
+    const isCustom = select.value === '__custom__';
+    customRow.classList.toggle('hidden', !isCustom);
+
+    const opt = select.selectedOptions[0];
+    description.textContent = (!isCustom && opt?.dataset.desc) ? opt.dataset.desc : '';
+
+    // Auto-fill host from catalog entry so user sees the default
+    const entry = findCatalogEntry(select.value);
+    if (entry && hostInput) hostInput.value = entry.host;
+
+    validateAndToggleSave();
+  });
+
+  customInput.addEventListener('input', validateAndToggleSave);
+  hostInput?.addEventListener('input',  validateAndToggleSave);
+  apiKeyInput?.addEventListener('input', validateAndToggleSave);
+  saveBtn.addEventListener('click', saveModelConfig);
+}
+
+
+async function loadModelConfig() {
+  try {
+    const res  = await fetch('/api/data/model', { method: 'GET' });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.ok) {
+      console.warn('Failed to load model config:', data.error || res.status);
+      return null;
+    }
+
+    currentModelConfig = data.config;   // null if nothing saved yet
+    if (currentModelConfig) hydrateModelConfig(currentModelConfig);
+    return currentModelConfig;
+  } catch (err) {
+    console.error('loadModelConfig error:', err);
+    return null;
+  }
+}
+
+
+function hydrateModelConfig(cfg) {
+  const isLocal = cfg.provider === 'ollama';
+  const targetTab = isLocal ? 'local' : 'cloud';
+
+  // 1. Activate the right tab
+  document.querySelectorAll('.model-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === targetTab);
+  });
+  document.querySelectorAll('.model-tab-panel').forEach(p => {
+    p.classList.toggle('hidden', p.id !== `modelTab-${targetTab}`);
+  });
+
+  // 2. For cloud: set the provider dropdown FIRST so populateModelSelect
+  //    can filter to that provider's models
+  if (!isLocal) {
+    const providerSelect = document.getElementById('cloudProviderSelect');
+    if (providerSelect) providerSelect.value = cfg.provider;
+  }
+
+  // 3. Populate the model dropdown for the active tab
+  populateModelSelect(targetTab);
+
+  // 4. Try to select the saved model in the dropdown
+  const select = document.getElementById('modelSelect');
+  const optionExists = [...select.options].some(o => o.value === cfg.model_name);
+
+  if (optionExists) {
+    select.value = cfg.model_name;
+    const opt = select.selectedOptions[0];
+    document.getElementById('modelDescription').textContent = opt?.dataset.desc || '';
+    document.getElementById('customModelRow').classList.add('hidden');
+  } else {
+    // Saved model isn't in catalog — fall back to custom input
+    select.value = '__custom__';
+    document.getElementById('customModelRow').classList.remove('hidden');
+    document.getElementById('customModelInput').value = cfg.model_name;
+    document.getElementById('modelDescription').textContent = '';
+  }
+
+  // 5. Restore host (local only)
+  if (isLocal && cfg.host) {
+    const hostInput = document.getElementById('ollamaHost');
+    if (hostInput) hostInput.value = cfg.host;
+  }
+
+  // Note: api_key is NOT hydrated — it's never sent back from the server,
+  // so the API key field stays empty. User only re-enters it if changing.
+
+  validateAndToggleSave();
+}
+
+// load model config data / form setup on load
+document.addEventListener('DOMContentLoaded', async () => {
+  initModelConfig();
+  await loadModelConfig();   // hydrate from saved row
+});
+
+
+
+
+
+
+
+
+// User experience
+// --------------------------------------------------
+// ============================================================
+// EXPERIENCE
+// ============================================================
+
+const experienceList   = document.getElementById('experienceList');
+const experienceAddBtn = document.getElementById('experienceAddBtn');
+const experienceStatus = document.getElementById('experienceStatus');
+
+let experienceEntries = [];   // cached list from server
+
+const BOOL_EXP_FIELDS = new Set(['is_current']);
+
+// ---------- Fetch ----------
+async function loadExperience() {
+  try {
+    const res = await fetch('/api/data/experience');
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    const data = await res.json();
+    experienceEntries = Array.isArray(data) ? data : (data.experience || []);
+    renderExperienceList();
+  } catch (err) {
+    console.log('Failed to load experience:', err);
+    experienceStatus.textContent = 'Failed to load experience.';
+  }
+}
+
+// ---------- Render ----------
+function renderExperienceList() {
+  experienceList.innerHTML = '';
+
+  if (!experienceEntries.length) {
+    experienceStatus.textContent = 'No experience added yet.';
+    return;
+  }
+  experienceStatus.textContent = `${experienceEntries.length} entr${experienceEntries.length === 1 ? 'y' : 'ies'}.`;
+
+  // Sort by sort_order, then current jobs first, then by start_date desc
+  const sorted = [...experienceEntries].sort((a, b) => {
+    if ((a.sort_order || 0) !== (b.sort_order || 0)) {
+      return (a.sort_order || 0) - (b.sort_order || 0);
+    }
+    if (a.is_current !== b.is_current) return b.is_current - a.is_current;
+    return (b.start_date || '').localeCompare(a.start_date || '');
+  });
+
+  for (const entry of sorted) {
+    experienceList.appendChild(renderExperienceCard(entry));
+  }
+}
+
+function renderExperienceCard(entry) {
+  const tpl = document.getElementById('experienceCardTemplate').content.cloneNode(true);
+  const card = tpl.querySelector('.experience-card');
+
+  card.querySelector('.experience-card-title').textContent   = entry.title || '(Untitled role)';
+  card.querySelector('.experience-card-company').textContent = entry.company || '';
+
+  const dateRange = formatDateRange(entry.start_date, entry.end_date, entry.is_current);
+  const meta = [dateRange, entry.location].filter(Boolean).join('  •  ');
+  card.querySelector('.experience-card-meta').textContent = meta;
+
+  card.querySelector('.experience-card-summary').textContent = entry.summary || '';
+
+  // Tech stack chips
+  const stackEl = card.querySelector('.experience-card-stack');
+  const stack = parseTechStack(entry.tech_stack);
+  for (const tech of stack) {
+    const chip = document.createElement('span');
+    chip.className = 'tech-chip';
+    chip.textContent = tech;
+    stackEl.appendChild(chip);
+  }
+
+  // Edit button → swap card for editor
+  card.querySelector('.experience-edit-btn').addEventListener('click', () => {
+    const editor = buildEditor(entry, card);
+    card.replaceWith(editor);
+  });
+
+  return card;
+}
+
+function formatDateRange(start, end, isCurrent) {
+  const fmt = (s) => {
+    if (!s) return '';
+    // YYYY-MM → "Jan 2024"
+    const [y, m] = s.split('-');
+    if (!y) return s;
+    if (!m) return y;
+    const date = new Date(Number(y), Number(m) - 1, 1);
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
+  const startStr = fmt(start);
+  const endStr   = Number(isCurrent) === 1 ? 'Present' : fmt(end);
+  if (!startStr && !endStr) return '';
+  return `${startStr || '?'} → ${endStr || '?'}`;
+}
+
+function parseTechStack(raw) {
+  if (!raw) return [];
+  // Stored as JSON array text, but tolerate comma-separated input from earlier saves
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch { /* not JSON, fall through */ }
+  return String(raw).split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// ---------- Editor ----------
+function buildEditor(entry, replaceCard /* nullable */) {
+  const tpl    = document.getElementById('experienceEditorTemplate').content.cloneNode(true);
+  const editor = tpl.querySelector('.experience-editor');
+  const isNew  = !entry || !entry.id;
+
+  // Populate inputs
+  editor.querySelectorAll('.profile-field-input').forEach(el => {
+    const key = el.dataset.field;
+    let val = entry?.[key];
+    if (BOOL_EXP_FIELDS.has(key)) {
+      el.value = String(Number(val) || 0);
+    } else if (key === 'tech_stack') {
+      // Display as comma-separated for editing
+      el.value = parseTechStack(val).join(', ');
+    } else {
+      el.value = val ?? '';
+    }
+  });
+
+  const saveBtn   = editor.querySelector('.experience-save-btn');
+  const cancelBtn = editor.querySelector('.experience-cancel-btn');
+  const deleteBtn = editor.querySelector('.experience-delete-btn');
+
+  if (!isNew) deleteBtn.classList.remove('hidden');
+
+  saveBtn.addEventListener('click', async () => {
+    const payload = collectExperienceForm(editor);
+    if (!isNew) payload.id = entry.id;
+
+    const original = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="spinner"></span><span>Saving...</span>';
+
+    try {
+      const method = isNew ? 'POST' : 'PATCH';
+      const url    = isNew ? '/api/data/experience' : `/api/data/experience/${entry.id}`;
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Server error (${res.status})`);
+      const saved = await res.json().catch(() => ({}));
+
+      // Update cache
+      if (isNew) {
+        experienceEntries.push({ ...payload, id: saved.id ?? Date.now() });
+      } else {
+        experienceEntries = experienceEntries.map(e => e.id === entry.id ? { ...e, ...payload } : e);
+      }
+
+      renderExperienceList();
+      configStatus.textContent = 'Experience saved.';
+    } catch (err) {
+      console.log('Experience save failed:', err);
+      saveBtn.innerHTML = original;
+      saveBtn.disabled = false;
+    }
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    if (isNew) {
+      editor.remove();
+    } else {
+      // Replace editor with original card
+      editor.replaceWith(renderExperienceCard(entry));
+    }
+  });
+
+  deleteBtn.addEventListener('click', async () => {
+    if (!confirm(`Delete this experience entry (${entry.title || 'untitled'} @ ${entry.company || '—'})?`)) return;
+
+    try {
+      const res = await fetch(`/api/data/experience/${entry.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server error (${res.status})`);
+
+      experienceEntries = experienceEntries.filter(e => e.id !== entry.id);
+      renderExperienceList();
+      configStatus.textContent = 'Experience deleted.';
+    } catch (err) {
+      console.log('Experience delete failed:', err);
+    }
+  });
+
+  return editor;
+}
+
+function collectExperienceForm(editor) {
+  const out = {};
+  editor.querySelectorAll('.profile-field-input').forEach(el => {
+    const key = el.dataset.field;
+    let val = el.value;
+
+    if (BOOL_EXP_FIELDS.has(key)) {
+      val = Number(val) === 1 ? 1 : 0;
+    } else if (key === 'tech_stack') {
+      // Store as JSON array text to match the table comment
+      const arr = String(val).split(',').map(s => s.trim()).filter(Boolean);
+      val = JSON.stringify(arr);
+    } else {
+      val = val.trim();
+    }
+    out[key] = val;
+  });
+
+  // If is_current=1, blank out end_date
+  if (out.is_current === 1) out.end_date = '';
+
+  return out;
+}
+
+// ---------- Add new entry ----------
+experienceAddBtn.addEventListener('click', () => {
+  // Don't allow multiple add-editors at once
+  if (experienceList.querySelector('.experience-editor')) return;
+
+  const editor = buildEditor(null, null);
+  experienceList.prepend(editor);
+});
+
+// ---------- Init ----------
+loadExperience();
 
 // setup lucide icons
 lucide.createIcons();

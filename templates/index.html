@@ -133,8 +133,65 @@
       <div class="card">
         <label>Model Configuration</label>
         <div class="config-section" id="modelConfigSection">
-          <!-- model fields go here -->
+
+        <!-- Tabs -->
+        <div class="model-tabs">
+          <button type="button" class="model-tab active" data-tab="local">Local</button>
+          <button type="button" class="model-tab" data-tab="cloud">Cloud</button>
         </div>
+
+        <!-- Tab panels (provider-specific fields) -->
+        <div class="model-tab-panel" id="modelTab-local">
+          <div class="form-row">
+            <label for="ollamaHost">Ollama Host</label>
+            <input type="text" id="ollamaHost" class="text-input"
+                  value="http://localhost:11434" placeholder="http://localhost:11434" />
+          </div>
+        </div>
+
+        <div class="model-tab-panel hidden" id="modelTab-cloud">
+          <div class="form-row">
+            <label for="cloudProviderSelect">Provider</label>
+            <select id="cloudProviderSelect" class="text-input">
+              <option value="">-- Select a provider --</option>
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI (GPT)</option>
+              <option value="google">Google (Gemini)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="apiKeyInput">API Key</label>
+            <input type="password" id="apiKeyInput" class="text-input"
+                  placeholder="api_key here..." autocomplete="off" />
+            <p class="hint">Encrypted and stored server-side.</p>
+          </div>
+        </div>
+
+        <!-- Shared: model picker (works for both tabs) -->
+        <div class="form-row">
+          <label for="modelSelect">Model</label>
+          <select id="modelSelect" class="text-input">
+            <option value="">-- Select a model --</option>
+            <option value="__custom__">Custom (enter model name manually)…</option>
+          </select>
+        </div>
+
+        <div class="form-row hidden" id="customModelRow">
+          <label for="customModelInput">Custom Model ID</label>
+          <input type="text" id="customModelInput" class="text-input"
+                placeholder="e.g. my-finetune:latest" autocomplete="off" />
+          <p class="hint">Format: <code>name</code> or <code>name:tag</code></p>
+        </div>
+
+        <p class="model-description hint" id="modelDescription"></p>
+
+        <button id="saveModelBtn" class="primary-btn" disabled>Save Model</button>
+        <p class="file-status" id="modelStatus"></p>
+      </div>
+
+
+        
       </div>
     
       <!-- Skills -->
@@ -169,6 +226,92 @@
           <p class="file-status" id="skillsStatus">Loading skill catalog...</p>
         </div>
       </div>
+
+
+      <!-- User Experience.... -->
+      <!-- Experience -->
+      <div class="card">
+        <div class="profile-header">
+          <label>Experience</label>
+          <button id="experienceAddBtn" class="secondary-btn profile-edit-btn">+ Add</button>
+        </div>
+
+        <div class="config-section" id="experienceSection">
+          <div id="experienceList" class="experience-list">
+            <!-- Entries injected by JS -->
+          </div>
+          <p class="file-status" id="experienceStatus">No experience added yet.</p>
+        </div>
+      </div>
+
+      <!-- Experience editor (shown when adding/editing an entry) -->
+      <template id="experienceEditorTemplate">
+        <div class="experience-editor">
+          <div class="profile-grid">
+            <div class="profile-field">
+              <span class="profile-field-label">Company</span>
+              <input type="text" class="profile-field-input" data-field="company" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">Title</span>
+              <input type="text" class="profile-field-input" data-field="title" />
+            </div>
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">Location</span>
+              <input type="text" class="profile-field-input" data-field="location" placeholder="City, State / Remote" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">Start Date</span>
+              <input type="month" class="profile-field-input" data-field="start_date" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">End Date</span>
+              <input type="month" class="profile-field-input" data-field="end_date" />
+            </div>
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">Currently Working Here</span>
+              <select class="profile-field-input" data-field="is_current">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">Summary</span>
+              <textarea class="profile-field-input" data-field="summary" rows="4"
+                        placeholder="What you did, impact, scope..."></textarea>
+            </div>
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">Tech Stack</span>
+              <input type="text" class="profile-field-input" data-field="tech_stack"
+                    placeholder="Python, React, Postgres (comma-separated)" />
+            </div>
+          </div>
+
+          <div class="experience-editor-actions">
+            <button class="primary-btn experience-save-btn">Save</button>
+            <button class="secondary-btn experience-cancel-btn">Cancel</button>
+            <button class="secondary-btn experience-delete-btn hidden">Delete</button>
+          </div>
+        </div>
+      </template>
+
+      <!-- Display card for an existing entry -->
+      <template id="experienceCardTemplate">
+        <div class="experience-card">
+          <div class="experience-card-header">
+            <div>
+              <div class="experience-card-title"></div>
+              <div class="experience-card-company"></div>
+            </div>
+            <div class="experience-card-actions">
+              <button class="secondary-btn profile-edit-btn experience-edit-btn">Edit</button>
+            </div>
+          </div>
+          <div class="experience-card-meta"></div>
+          <div class="experience-card-summary"></div>
+          <div class="experience-card-stack"></div>
+        </div>
+      </template>
     
       <!-- User profile -->
       <!-- User profile -->

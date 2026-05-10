@@ -28,6 +28,10 @@ async def index():
 @app.before_serving
 async def _startup():
     init_db() # init db, if user has no database schema made, it will auto create tables and create file for them
+
+    # Start model according to config...
+
+        # issue of - if no model is listed then it cant start...
     #start_ollama()
     print("Starting server...")
 

@@ -580,6 +580,219 @@ textarea.profile-field-input { resize: vertical; min-height: 60px; }
 
 
 
+
+
+/* model config */
+
+
+/* MODEL CONFIG */
+.model-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #1e293b;
+  margin-bottom: 16px;
+  margin-top: -4px;
+}
+.model-tab {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: inherit;
+  transition: color 0.2s, border-color 0.2s;
+}
+.model-tab:hover { color: #a5b4fc; }
+.model-tab.active {
+  color: #a5b4fc;
+  border-bottom-color: #6366f1;
+}
+.model-tab-panel.hidden { display: none; }
+
+/* Form rows inside the model config */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.form-row label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+}
+
+/* Generic text input — matches .skills-search-input */
+.text-input {
+  width: 100%;
+  background: #020617;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.text-input:focus { border-color: #6366f1; }
+
+/* Native <select> styled to match the dark theme + custom chevron */
+select.text-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+  cursor: pointer;
+}
+select.text-input optgroup {
+  background: #0f172a;
+  color: #a5b4fc;
+  font-style: normal;
+  font-weight: 600;
+}
+select.text-input option {
+  background: #020617;
+  color: #e2e8f0;
+  font-family: 'DM Mono', monospace;
+  padding: 6px;
+}
+
+/* Hint text under a field */
+.hint {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+.hint code {
+  background: #1e1b4b;
+  color: #c7d2fe;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+}
+
+/* Selected model description shown under the dropdown */
+.model-description {
+  margin: -4px 0 14px;
+  padding: 10px 12px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-left: 2px solid #6366f1;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.model-description:empty { display: none; }
+
+
+
+/* user experience */
+
+
+/* EXPERIENCE */
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.experience-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.experience-card:hover { border-color: #312e81; }
+
+.experience-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.experience-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.experience-card-company {
+  font-size: 13px;
+  color: #a5b4fc;
+  margin-top: 2px;
+}
+.experience-card-meta {
+  font-size: 12px;
+  color: #64748b;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 10px;
+}
+.experience-card-summary {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+.experience-card-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.experience-card-stack .tech-chip {
+  background: #1e1b4b;
+  color: #c7d2fe;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-family: 'DM Mono', monospace;
+}
+
+.experience-editor {
+  background: #020617;
+  border: 1px solid #4338ca;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.experience-editor-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #1e293b;
+}
+.experience-editor-actions .experience-delete-btn {
+  margin-left: auto;
+  color: #f87171;
+  border-color: #1e293b;
+}
+.experience-editor-actions .experience-delete-btn:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+
+
+
 /* animations */
 
 

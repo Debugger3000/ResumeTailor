@@ -112,7 +112,7 @@ inputs_field_schema = {
 
 POPULATE_FIELDS_PROMPT = """You fill in job application form fields using the user's profile data.
 
-You receive: {"profile": {...}, "fields": [...]}
+You receive: {"experience": {...},"profile": {...}, "fields": [...]}
 
 
 
