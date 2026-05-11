@@ -6,9 +6,10 @@ from quart import Quart, render_template, request, jsonify, send_file
 from blueprints.tailor import tailor_bp
 from blueprints.apply import apply_bp
 from blueprints.data import data_bp
-from services.ollama_lifecycle import start_ollama
+from services.ai_model_control.run_local_model import start_ollama
 from database.db import init_db
-
+from services.ai_model_control.helpers import is_model_listed, is_model_local
+from database.queries.ai_models import get_model_config
 # Run Devleopment
 # hypercorn app:app -c hypercorn.toml --reload
 
@@ -29,10 +30,25 @@ async def index():
 async def _startup():
     init_db() # init db, if user has no database schema made, it will auto create tables and create file for them
 
-    # Start model according to config...
 
-        # issue of - if no model is listed then it cant start...
-    #start_ollama()
+
+    # does default model exist ?
+        # if NOT, do not start any connection to cloud model or open local model
+    if is_model_listed():
+        model = get_model_config()
+        if model:
+            # returned something
+            if is_model_local(model.get('provider')):
+            # is local model
+            # run local model and connect to it
+                start_ollama(model)
+        # else:
+            # connect to cloud model...
+            # is cloud model
+
+
+
+    
     print("Starting server...")
 
 

@@ -1,8 +1,17 @@
 import subprocess
 import sys
 from pathlib import Path
+from const.ai_models import ModelProvider
+from database.queries.ai_models import get_model_config
 
-SCRIPTS_DIR = Path(__file__).parent.parent / "scripts"
+
+
+
+SCRIPTS_DIR = Path(__file__).parent.parent.parent / "scripts"
+
+
+
+
 
 
 def _run_powershell(script_name: str, *args: str) -> tuple[int, str, str]:
@@ -30,10 +39,21 @@ def _run_powershell(script_name: str, *args: str) -> tuple[int, str, str]:
 
 # Start local ollama instance
 # ---
-def start_ollama() -> None:
+def start_ollama(model: ModelProvider) -> None:
     """Run Start-Ollama.ps1. Raises RuntimeError on failure."""
-    print("[ollama] Starting via PowerShell...", flush=True)
-    code, stdout, stderr = _run_powershell("start_ollama.ps1")
+    print("[ollama] Starting via PowerShell... hehehehe", flush=True)
+
+    model_name = model.get("model_name")
+    host = model.get("host")
+
+    if not model_name:
+        raise RuntimeError("model_config.model_name is not set")
+    
+    args = ["-Model", model_name]
+    if host:
+        args.extend(["-Ollamahost", host])
+
+    code, stdout, stderr = _run_powershell("start_ollama.ps1", *args)
 
     if stdout:
         print(stdout, flush=True)

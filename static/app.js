@@ -742,7 +742,18 @@ const MODEL_CATALOG = [
 
 const PROVIDER_NEEDS_KEY = (provider) => provider !== 'ollama';
 let currentModelConfig = null;   // module-level cache of the saved row
+let isDirty = false;
 
+
+function markDirty() {
+  isDirty = true;
+  validateAndToggleSave();
+}
+
+function markPristine() {
+  isDirty = false;
+  validateAndToggleSave();
+}
 
 // ---------- Helpers ----------
 function findCatalogEntry(modelName) {
@@ -782,6 +793,12 @@ function validateAndToggleSave() {
   const saveBtn = document.getElementById('saveModelBtn');
   const entry   = getCurrentEntry();
 
+  // Not dirty = nothing to save
+  if (!isDirty) {
+    saveBtn.disabled = true;
+    return;
+  }
+
   if (!entry || !entry.model_name || !MODEL_ID_RE.test(entry.model_name)) {
     saveBtn.disabled = true;
     return;
@@ -804,7 +821,7 @@ function validateAndToggleSave() {
 // ---------- Save ----------
 async function saveModelConfig() {
   const saveBtn = document.getElementById('saveModelBtn');
-  const status  = document.getElementById('modelStatus');
+  const status  = document.getElementById('modelStatusConfig');
   const entry   = getCurrentEntry();
 
   if (!entry) return;
@@ -841,11 +858,53 @@ async function saveModelConfig() {
 
     status.textContent = `Saved: ${entry.model_name}`;
     status.className = 'status success';
+    markPristine();
+
+    // send another request to restart model connection / server
+    await restart_model_server();
+
   } catch (err) {
     status.textContent = `Save failed: ${err.message}`;
     status.className = 'status error';
   } finally {
     validateAndToggleSave();
+  }
+}
+
+async function restart_model_server() {
+  // Flip pill to "restarting" immediately — also pause polling so a stale
+  // "stopped" response doesn't briefly flicker in while the server restarts
+  stopModelStatusPolling();
+
+  const entry = getCurrentEntry();
+  renderModelStatus({
+    restarting: true,
+    provider:   entry?.provider,
+    model_name: entry?.model_name,
+  });
+
+  try {
+    const res = await fetch('/api/data/model/updated', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    console.log('Successful new model config restart');
+
+    // Server returned fresh status in the response — use it directly
+    //renderModelStatus(data);
+
+  } catch (err) {
+    console.log(`Issues restarting new model config: ${err}`);
+    renderModelStatus({
+      running: false,
+      error: `Restart failed: ${err.message}`,
+    });
+  } finally {
+    // Resume polling to keep status fresh
+    startModelStatusPolling(5000);
   }
 }
 
@@ -902,7 +961,7 @@ function initModelTabs() {
       // Reset description + custom
       document.getElementById('modelDescription').textContent = '';
       document.getElementById('customModelRow').classList.add('hidden');
-      validateAndToggleSave();
+      markDirty();
     });
   });
 }
@@ -930,12 +989,12 @@ function initModelConfig() {
     const entry = findCatalogEntry(select.value);
     if (entry && hostInput) hostInput.value = entry.host;
 
-    validateAndToggleSave();
+    markDirty();
   });
 
-  customInput.addEventListener('input', validateAndToggleSave);
-  hostInput?.addEventListener('input',  validateAndToggleSave);
-  apiKeyInput?.addEventListener('input', validateAndToggleSave);
+  customInput.addEventListener('input', markDirty);
+  hostInput?.addEventListener('input',  markDirty);
+  apiKeyInput?.addEventListener('input', markDirty);
   saveBtn.addEventListener('click', saveModelConfig);
 }
 
@@ -945,14 +1004,16 @@ async function loadModelConfig() {
     const res  = await fetch('/api/data/model', { method: 'GET' });
     const data = await res.json().catch(() => ({}));
 
-    if (!res.ok || !data.ok) {
+    console.log(`Saved Model details: ${data}`);
+    console.log(`Saved Model details: ${data.provider}`);
+    if (!res.ok) {
       console.warn('Failed to load model config:', data.error || res.status);
       return null;
     }
 
-    currentModelConfig = data.config;   // null if nothing saved yet
-    if (currentModelConfig) hydrateModelConfig(currentModelConfig);
-    return currentModelConfig;
+       // null if nothing saved yet
+    hydrateModelConfig(data);
+    return data;
   } catch (err) {
     console.error('loadModelConfig error:', err);
     return null;
@@ -1008,7 +1069,7 @@ function hydrateModelConfig(cfg) {
   // Note: api_key is NOT hydrated — it's never sent back from the server,
   // so the API key field stays empty. User only re-enters it if changing.
 
-  validateAndToggleSave();
+  markPristine(); 
 }
 
 // load model config data / form setup on load
@@ -1257,6 +1318,90 @@ experienceAddBtn.addEventListener('click', () => {
 
 // ---------- Init ----------
 loadExperience();
+
+
+
+
+let modelStatusPollTimer = null;
+
+async function fetchModelStatus() {
+  try {
+    const res = await fetch('/api/data/model/status', { method: 'GET' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { running: false, error: data.error || `HTTP ${res.status}` };
+    }
+    return data;
+  } catch (err) {
+    return { running: false, error: err.message };
+  }
+}
+
+function renderModelStatus(status) {
+  const el     = document.getElementById('modelStatus');
+  const textEl = el.querySelector('.model-status-text');
+  if (!el || !textEl) return;
+
+  el.classList.remove('running', 'stopped', 'unknown', 'restarting');
+
+  // Explicit "restarting" state passed in
+  if (status.restarting) {
+    el.classList.add('restarting');
+    const provider  = status.provider  || '';
+    const modelName = status.model_name || '';
+    textEl.textContent = provider && modelName
+      ? `Restarting ${provider} — ${modelName}…`
+      : 'Restarting…';
+    el.title = 'Model connection is restarting';
+    return;
+  }
+
+  if (status.running) {
+    el.classList.add('running');
+    const provider  = status.provider  || 'ollama';
+    const modelName = status.model_name || 'unknown';
+    textEl.textContent = `Connected to ${provider} — ${modelName}`;
+    el.title = `Host: ${status.host || 'n/a'}\nLoaded: ${(status.loaded_models || []).join(', ') || 'none'}`;
+  } else {
+    el.classList.add('stopped');
+    const reason = status.error ? ` (${status.error})` : '';
+    textEl.textContent = `Disconnected${reason}`;
+    el.title = status.error || 'Model is not running';
+  }
+}
+
+async function refreshModelStatus() {
+  const status = await fetchModelStatus();
+  renderModelStatus(status);
+}
+
+function startModelStatusPolling(intervalMs = 5000) {
+  stopModelStatusPolling();
+  refreshModelStatus();  // immediate
+  modelStatusPollTimer = setInterval(refreshModelStatus, intervalMs);
+}
+
+function stopModelStatusPolling() {
+  if (modelStatusPollTimer) {
+    clearInterval(modelStatusPollTimer);
+    modelStatusPollTimer = null;
+  }
+}
+
+// Pause polling when tab is hidden (saves resources)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopModelStatusPolling();
+  } else {
+    startModelStatusPolling(5000);
+  }
+});
+
+// Kick off on page load
+document.addEventListener('DOMContentLoaded', () => {
+  // ... your existing init code ...
+  startModelStatusPolling(5000);
+});
 
 // setup lucide icons
 lucide.createIcons();

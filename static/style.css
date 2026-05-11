@@ -791,7 +791,79 @@ select.text-input option {
 }
 
 
+/* model connection status */
 
+.model-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.model-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #888;
+  flex-shrink: 0;
+}
+
+/* Running — green */
+.model-status.running {
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.3);
+}
+.model-status.running .model-status-dot {
+  background: #2ecc71;
+  box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+}
+
+/* Stopped / error — red */
+.model-status.stopped {
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.3);
+}
+.model-status.stopped .model-status-dot {
+  background: #e74c3c;
+}
+
+/* Unknown / checking — amber */
+.model-status.unknown {
+  color: #f39c12;
+  border-color: rgba(243, 156, 18, 0.3);
+}
+.model-status.unknown .model-status-dot {
+  background: #f39c12;
+}
+
+/* Make sure app-title can hold the new pill */
+#app-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Restarting — amber with a pulse */
+.model-status.restarting {
+  color: #f39c12;
+  border-color: rgba(243, 156, 18, 0.3);
+}
+.model-status.restarting .model-status-dot {
+  background: #f39c12;
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.85); }
+}
 
 /* animations */
 
