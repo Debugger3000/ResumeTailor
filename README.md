@@ -42,16 +42,15 @@ Navigate to a page with form fields and let the model fill in everything for you
 
 If you find the job application process stressful and painful, and want to make it easier for yourself.
 
-> **The main takeaway** — it's a numbers game. Across tens or hundreds of applications, this saves you hours of time and thousands of keystrokes and clicks.
+> **The main takeaway** — it's a numbers game. Across tens or hundreds of applications, this saves you hours of time and thousands of keystrokes and clicks. Automate the repetitive tasks such as tailoring a new resume for each job, and filling out the same forms again and again.
 
 | | |
 |---|---|
 | **Free** | No monthly fees or token costs |
 | **Open Source** | Change the model prompts, swap models, add features — make it yours |
 | **Save Time** | Cut down each application's time with minimal grunt work |
-| **Save Sanity** | Automate the tedious and boring parts of applying |
 | **Save Clicks** | Click once and let the work be done for you |
-
+| **Save Sanity** | Automate the tedious parts of applying |
 
 
 ## 💻 Requirements
