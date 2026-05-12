@@ -1,112 +1,147 @@
+<div align="center">
+
 # JobPilot
 
-> Your local AI agent for Resume Tailoring and Form Completion Automation
+### Your local AI agent for Resume Tailoring and Form Completion
+
+![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22+-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
+
+*Save time. Save clicks. Save your sanity.*
+
+</div>
 
 ---
 
-## Chapters
-- [What does this application do?](#what-does-this-application-do)
-- [Why use this?](#why-use-this)
-- [Requirements](#requirements)
-- [How to Use](#how-to-use)
-- [Commands](#commands)
-- [Performance & Benchmarks](#performance--benchmarks)
-- [License](#license)
-
-## What does this application do?
-
-JobPilot automates out the tedious tasks that comes with applying to jobs. Tailoring your resume, and filling out forms.
-
-1. **Resume Tailoring**
-- Give your resume and a job description, and let the model do the work. Swapping skills and job titles, so you don't have too.
-
-2. **Form Completion**
-- Navigate to a page with form fields and let the model fill in everything for you
-
----
-
-## Why use this?
-
-If you want to **save time** and **your sanity** applying to jobs
-
-If you're asking yourself "does this actually make a difference?", well good question. I had the same thought before I started developing this.
-
-**The main take away**, is that this is saving you minutes, reducing stress and reducing clicks for every application. As mentioned, its a numbers game. Across tens or over hundreds of applications, this is saving you hours of your time, and of course making the process a lot less painful.
-Sure you can copy and paste the same information again and again if you want. But I would much rather click once and protect my mental.
-
-- **Free** — no monthly fees or token costs
-- **Open Source** - change the model prompts, tailor again temperature, add in whatever feature you want. Make it yours.
-- **Save Time** — cut down each application time with minimal hands on grunt work
-- **Save Sanity** — Automate the tedious and boring tasks that comes with applying to jobs
-
----
+## 📖 Chapters
+- [What does this application do?](#-what-does-this-application-do)
+- [Why use this?](#-why-use-this)
+- [Requirements](#-requirements)
+- [How to Use](#-how-to-use)
+- [Commands](#-commands)
+- [Performance & Benchmarks](#-performance--benchmarks)
+- [Notes](#-notes)
+- [License](#-license)
 
 
-## Requirements
+## 📝 What does this application do?
 
-Hardware dependent since this project mainly utilizes a local model, which of course needs a decent computer.
+Automate Resume Tailoring and Form Completion for job applications.
 
-** Cloud model connection coming soon...**
+### Resume Tailoring
+Give your resume and a job description, and let the model do the work. Swapping skills and synonymous job titles, so you don't have to.
 
-- **OS:** Windows 11
-- **RAM:** 16GB minimum
-- **Ollama:** [Download & install Ollama](https://ollama.com/download)
-- **Local model:** A compatible LLM pulled via Ollama (e.g. `llama3` or `qwen3:8b`)
-- **Python:** 3.10 or higher — [Download Python](https://www.python.org/downloads/)
-- **Node.js:** 22 or higher — [Download Node.js](https://nodejs.org/)
+### Form Completion
+Navigate to a page with form fields and let the model fill in everything for you.
 
----
+
+## 💡 Why use this?
+
+If you find the job application process stressful and painful, and want to make it easier for yourself.
+
+> **The main takeaway** — it's a numbers game. Across tens or hundreds of applications, this saves you hours of time and thousands of keystrokes and clicks.
+
+| | |
+|---|---|
+| **Free** | No monthly fees or token costs |
+| **Open Source** | Change the model prompts, swap models, add features — make it yours |
+| **Save Time** | Cut down each application's time with minimal grunt work |
+| **Save Sanity** | Automate the tedious and boring parts of applying |
+| **Save Clicks** | Click once and let the work be done for you |
 
 
 
-## How to Use
+## 💻 Requirements
 
-1. **Install Ollama** and pull your preferred model (see Requirements).
-2. **Clone this repo:**
-```git clone https://github.com/Debugger3000/ResumeTailor```
-3. **Install dependencies:** (see Commands below).
-5. **Run the server** (see Commands below).
-6. Open your browser to `"http://127.0.0.1:8000"`.
-7. Select model you pulled in config, and voila, your good to go !
+Hardware dependent since this project mainly utilizes a local model, which needs a decent computer.
 
----
+> **Cloud model connection coming soon...**
 
-## Commands
+| Requirement | Details |
+|---|---|
+| **OS** | Windows 10+ |
+| **System Specs** | [Ollama System Requirements Guide](https://localaimaster.com/blog/ollama-system-requirements) |
+| **Ollama** | [Download & Install](https://ollama.com/download) |
+| **Local Model** | A compatible LLM via Ollama (e.g. `llama3` or `qwen3:8b`) — [Browse Models](https://ollama.com/library) |
+| **Python** | 3.10 or higher — [Download](https://www.python.org/downloads/) |
+| **Node.js** | 22 or higher — [Download](https://nodejs.org/) |
+
+
+
+## 🚦 How to Use
+
+**1.** Install Ollama and pull your preferred model (see Requirements).
+
+**2.** Clone this repo:
+```bash
+git clone https://github.com/Debugger3000/ResumeTailor
+```
+
+**3.** Install dependencies (see Commands below).
+
+**4.** Run the server (see Commands below).
+
+**5.** Open your browser to `http://127.0.0.1:8000`.
+
+**6.** Select the model you pulled in config — and voilà, you're good to go! 🎉
+
+
+
+## 🔧 Commands
 
 ### Ollama
-| Command | Description |
-|---------|-------------|
-| `ollama pull qwen3:8b` | Download the Qwen3 8B model (recommended) |
+
+Download an Ollama model (pick one that fits your system):
+```bash
+ollama pull qwen3:8b
+```
 
 ### Setup & Run
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install client side JS dependencies |
-| `pip install -r requirements.txt` | Install server side python dependencies |
-| `hypercorn app:app -c hypercorn.toml` | Start the server / app |
 
----
+Install client-side JS dependencies:
+```bash
+npm install
+```
 
-## Performance & Benchmarks
+Install server-side Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Start the server / app:
+```bash
+hypercorn app:app -c hypercorn.toml
+```
+
+
+
+## 📊 Performance & Benchmarks
 
 Performance varies based on your hardware and chosen model. Below are benchmarks from my own development machine.
-
-### Test Machine
-- **CPU:** [AMD Ryzen 7 5800X 8-Core Processor, 3.8 Ghz, 8 Core]
-- **GPU:** [NVIDIA RTX 3070, 8GB VRAM]
-- **RAM:** [32GB DDR4]
-- **OS:** Windows 11
 
 ### Model Completion Times
 
 | Model | Resume Tailoring | Form Completion | Notes |
-|-------|------------------|-----------------|-------|
-| `qwen3:8b` | ~25s | ~22s | Recommended — best balance of speed and quality |
-| `llama3:8b` | ~12s | ~6s | Faster, slightly less accurate on technical resumes |
+|-------|:---:|:---:|-------|
+| `qwen3:8b` | ~25s | ~22s | **Recommended** — best balance of speed and quality |
+| `llama3:8b` | ~30s | ~28s | Faster, slightly less accurate on technical resumes |
 | `qwen3:14b` | ~35s | ~20s | Higher quality output, needs more VRAM |
-| `mistral:7b` | ~10s | ~5s | Fastest, lighter quality |
+| `mistral:7b` | ~24s | ~23s | Fastest, lighter quality |
 
 
-## License
+## 📌 Notes
+
+- **Resume format:** Multi-column resumes have not been tested and likely won't work well. A single-column layout is recommended (for this app, and in general).
+- **Model completion times can vary due to:**
+  - Local model used — reasoning models are recommended
+  - Long job descriptions — paste only what the model needs (job title, skills, etc.)
+  - Large webpages with many form fields
+- **Tested on Windows 11.** Not currently supported on macOS or Linux.
+
+
+## 📜 License
 
 MIT
