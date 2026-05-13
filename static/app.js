@@ -1328,8 +1328,13 @@ async function fetchModelStatus() {
   try {
     const res = await fetch('/api/data/model/status', { method: 'GET' });
     const data = await res.json().catch(() => ({}));
+    // request threw error
     if (!res.ok) {
       return { running: false, error: data.error || `HTTP ${res.status}` };
+    }
+    // req good, but no model configured
+    if(!data.configured){
+       return { configured: false };
     }
     return data;
   } catch (err) {
@@ -1354,6 +1359,11 @@ function renderModelStatus(status) {
       : 'Restarting…';
     el.title = 'Model connection is restarting';
     return;
+  }
+  else if(!status.configured) {
+    el.classList.add('stopped');
+    textEl.textContent = `Model is not Configured`;
+    el.title =  'Model is not configured';
   }
 
   if (status.running) {

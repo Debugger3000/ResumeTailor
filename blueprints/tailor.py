@@ -7,10 +7,9 @@ from const.approved_skills import approved_skills
 
 from ollama import AsyncClient
 # from services.docx_tools import TOOL_SCHEMAS, TOOL_REGISTRY
-from services.tailor_agent import (
+from services.tailor.tailor_agent import (
     extract_paragraphs,
     tailor_resume_in_place,  # new — does everything internally
-    score_fit,
     extract_applicable_paragraphs
 )
 
@@ -59,7 +58,7 @@ async def tailor():
         # run list of lines / paragraphs to model to swap ones that match model prompt
             # summary, skills, job titles, bullet points...
     changes_count, model_summary = await tailor_resume_in_place(
-        original_path, output_path, paragraphs, applicable_paragraphs, job_description, approved_skills,
+        original_path, output_path, applicable_paragraphs, job_description, approved_skills,
     )
     print("After Model Summary")
 

@@ -6,10 +6,11 @@ from database.queries.get_skill_catalog import get_skills_catalog
 from database.queries.post_user_skills import add_user_skills
 from database.queries.user_profile import get_user_profile, update_user_profile
 from database.queries.ai_models import save_model_config, get_model_config
-from services.apply_agent import get_full_user_data
+from services.apply.apply_agent import get_full_user_data
 from database.queries.experience import get_user_experience, create_user_experience, patch_user_experience, delete_user_experience
 from services.ai_model_control.helpers import ollama_status, is_model_local
 from services.ai_model_control.run_local_model import stop_ollama, start_ollama
+from services.ai_model_control.ollama_client import ollama_client
 # blueprint - route name is 'tailor'
 data_bp = Blueprint('data', __name__)
 
@@ -114,6 +115,7 @@ async def save_model():
 
     return {"ok": True}
 
+# route called, after server updates model config, to update ollama_client object and restart ollama with new model config
 @data_bp.route('/model/updated', methods=['POST'])
 async def updated_model_run():
 
@@ -127,6 +129,7 @@ async def updated_model_run():
         if is_model_local(model.get('provider')):
             stop_ollama()
             time.sleep(0.5)  # let port release
+            ollama_client.configure(model)
             start_ollama(model)
         # else: cloud — nothing to restart, config is enough
 
@@ -148,10 +151,12 @@ async def get_model():
 @data_bp.route('/model/status', methods=['GET'])
 async def get_model_status():
     model = get_model_config()
+    # no config exists currently...
     if not model:
         return jsonify({
             "running": False,
             "provider": None,
+            "configured": False,
             "model_name": None,
             "host": None,
             "loaded_models": [],
@@ -168,6 +173,7 @@ async def get_model_status():
     return jsonify({
         "running": True,  # assume cloud is reachable until we add a real check
         "provider": model.get('provider'),
+        "configured": True,
         "model_name": model.get('model_name'),
         "host": model.get('host'),
         "loaded_models": [],

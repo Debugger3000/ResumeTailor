@@ -1,5 +1,5 @@
 from playwright.async_api import async_playwright, BrowserContext, Page, Playwright
-
+from database.queries.get_user_data_apply import get_user_profile, get_user_skills, get_work_experience
 # app/services/page_reader.py
 
 # return page html from playwright session
@@ -7,6 +7,20 @@ from playwright.async_api import async_playwright, BrowserContext, Page, Playwri
 #     """Return the full rendered HTML of the current page."""
 #     return await session.page.content()
 
+
+
+
+
+def get_full_user_data() -> dict:
+    """
+    Aggregate user data from all sources into a single flat-ish dict
+    suitable for passing to the model.
+    """
+    return {
+        "profile": get_user_profile(),         # spread profile keys at top level
+        "experience": get_work_experience(),
+        "skills": get_user_skills(),
+    }
 
 
 # Input: page object (playwright import), fields (input html fields grabbed from page)
@@ -59,42 +73,6 @@ async def fill_fields(page_or_frame, fields: list[dict]) -> dict:
     return results
 
 
-# async def fill_one(page_or_frame, field: dict) -> None:
-#     """Fill a single field. Raises on failure."""
-#     agent_id = field["agent_id"]
-#     kind = field["kind"]
-#     value = field["value"]
-#     locator = page_or_frame.locator(f'[data-agent-id="{agent_id}"]')
-    
-#     # Make sure the field is visible/in view before interacting
-#     await locator.scroll_into_view_if_needed(timeout=5000)
-    
-#     if kind in ("text", "email", "tel", "textarea", "number", "url", "password"):
-#         await locator.fill(str(value))
-    
-#     elif kind == "select":
-#         await locator.select_option(value=str(value))
-    
-#     elif kind == "checkbox":
-#         if value:
-#             await locator.check()
-#         else:
-#             await locator.uncheck()
-    
-#     elif kind == "radio":
-#         # Radios share a `name` attribute; click the one whose value matches
-#         name = field.get("name")
-#         value = field["value"]
-#         if not name:
-#             raise ValueError(f"radio field {field['agent_id']} has no name attribute")
-#         radio = page_or_frame.locator(f'input[type="radio"][name="{name}"][value="{value}"]')
-#         await radio.check()
-        
-#     elif kind == "file":
-#         await locator.set_input_files(str(value))
-    
-#     else:
-#         raise ValueError(f"unknown field kind: {kind!r}")
 
 async def fill_one(page_or_frame, field: dict) -> None:
     agent_id = field["agent_id"]
@@ -158,68 +136,6 @@ async def find_apply_frame(page):
         except Exception:
             continue
     return best
-
-
-# grab input fields and extract data of specific input fields manually 
-# async def extract_form_fields(page: Page) -> list[dict]:
-#     """Walk the DOM, return one dict per input with everything pre-resolved."""
-#     fields = await page.evaluate("""
-#         () => {
-#             const results = [];
-#             const controls = document.querySelectorAll(
-#                 'input:not([type=hidden]):not([type=submit]):not([type=button]), select, textarea'
-#             );
-            
-#             controls.forEach((el, idx) => {
-#                 // Tag the element so we can find it later without a fragile selector
-#                 el.setAttribute('data-agent-id', `field-${idx}`);
-                
-#                 // Find associated label text
-#                 let labelText = '';
-#                 if (el.id) {
-#                     const lbl = document.querySelector(`label[for="${el.id}"]`);
-#                     if (lbl) labelText = lbl.innerText.trim();
-#                 }
-#                 if (!labelText) {
-#                     const wrapping = el.closest('label');
-#                     if (wrapping) labelText = wrapping.innerText.trim();
-#                 }
-#                 if (!labelText) {
-#                     labelText = el.getAttribute('aria-label') 
-#                         || el.getAttribute('placeholder') 
-#                         || '';
-#                 }
-                
-#                 // Pull options for selects/radios
-#                 let options = null;
-#                 if (el.tagName === 'SELECT') {
-#                     options = Array.from(el.options)
-#                         .map(o => ({ value: o.value, label: o.text.trim() }))
-#                         .filter(o => o.value);
-#                 }
-                
-#                 results.push({
-#                     index: idx,
-#                     agent_id: `field-${idx}`,
-#                     tag: el.tagName.toLowerCase(),
-#                     input_type: el.type || null,
-#                     name: el.name || null,
-#                     question: labelText,
-#                     options: options,
-#                     required: el.required || el.getAttribute('aria-required') === 'true',
-#                     current_value: el.value || '',
-#                 });
-#             });
-            
-#             // Also pick up radio groups — group them by name
-#             // (radios share a `name` and the user picks one)
-            
-#             return results;
-#         }
-#     """)
-#     return fields
-
-
 
 
 async def get_focused_page(session) -> Page:

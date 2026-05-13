@@ -36,6 +36,7 @@ def ollama_status(model: ModelProvider) -> OllamaStatus:
         "provider": provider,
         "model_name": model_name,
         "host": host,
+        "configured": True,
     }
 
     try:

@@ -1,10 +1,10 @@
 from quart import Blueprint, request, jsonify
-from services.browser import manager
+from services.browser.browser import manager
 import uuid
-from services.apply import extract_form_fields, fill_fields, get_focused_page
-from services.apply_agent import populate_field_values
-from services.browser_helpers import resolve_active_page, wait_for_page_ready, find_form_target, click_continue
-from services.apply_fields_filter import filter_fields
+from services.apply.apply_helpers import extract_form_fields, fill_fields, get_focused_page
+from services.apply.apply_agent import populate_field_values
+from services.browser.browser_helpers import resolve_active_page, wait_for_page_ready, find_form_target, click_continue
+from services.apply.apply_fields_filter import filter_fields
 
 apply_bp = Blueprint('apply', __name__)
 

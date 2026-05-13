@@ -10,6 +10,7 @@ from services.ai_model_control.run_local_model import start_ollama
 from database.db import init_db
 from services.ai_model_control.helpers import is_model_listed, is_model_local
 from database.queries.ai_models import get_model_config
+from services.ai_model_control.ollama_client import ollama_client
 # Run Devleopment
 # hypercorn app:app -c hypercorn.toml --reload
 
@@ -36,10 +37,13 @@ async def _startup():
         # if NOT, do not start any connection to cloud model or open local model
     if is_model_listed():
         model = get_model_config()
+        # if no model config exists, it doesnt start any...
         if model:
             # returned something
             if is_model_local(model.get('provider')):
             # is local model
+            # set up client variable for functions to use
+                ollama_client.configure(model)
             # run local model and connect to it
                 start_ollama(model)
         # else:
