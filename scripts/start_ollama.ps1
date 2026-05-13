@@ -12,19 +12,6 @@ param(
 # Set Ollama env vars from params (sourced from DB)
 $env:OLLAMA_HOST = $OllamaHost
 
-
-# Load .env if present
-# $envFile = Join-Path $PSScriptRoot "..\.env"
-# if (Test-Path $envFile) {
-#     Get-Content $envFile | ForEach-Object {
-#         if ($_ -match '^\s*([^#][^=]+?)\s*=\s*(.+?)\s*$') {
-#             [Environment]::SetEnvironmentVariable($matches[1], $matches[2], "Process")
-#         }
-#     }
-# }
-
-
-
 Write-Host "Starting Ollama with model: $Model"
 Write-Host "Host: $OllamaHost"
 
@@ -49,17 +36,6 @@ function Test-OllamaRunning {
 }
 
 $running = Test-OllamaRunning -Url $healthUrl
-
-
-# $model = if ($env:OLLAMA_MODEL) { $env:OLLAMA_MODEL } else { "qwen3:8b" }
-
-#Write-Host "Checking if Ollama is already running..." -ForegroundColor Cyan
-
-# $running = try {
-#     (Invoke-WebRequest "http://localhost:11434/api/tags" -UseBasicParsing -TimeoutSec 2).StatusCode -eq 200
-# } catch {
-#     $false
-# }
 
 if ($running) {
     Write-Host "Ollama is already running - skipping startup" -ForegroundColor Yellow

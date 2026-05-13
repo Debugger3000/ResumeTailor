@@ -12,16 +12,19 @@
 #   "multi_select": False
 # }
 
-inputs_field_schema = {
-    "agent_id": "field-3",        # stable handle you set in DOM
-    "kind": "text",                # text | email | select | radio | checkbox | file | textarea
-    "question": "Email address",   # human-readable, from label/aria-label/placeholder
-    "options": None,               # [{value, label}] for select/radio, else None
-    "required": True,
-    "value": "",                   # what the model decides to fill
-}
+# inputs_field_schema = {
+#     "agent_id": "field-3",        # stable handle you set in DOM
+#     "kind": "text",                # text | email | select | radio | checkbox | file | textarea
+#     "question": "Email address",   # human-readable, from label/aria-label/placeholder
+#     "options": None,               # [{value, label}] for select/radio, else None
+#     "required": True,
+#     "value": "",                   # what the model decides to fill
+# }
 
-
+# -----
+# Prompt for form completion
+# Change this if you want to change how forms are completed
+# -----
 APPLY_PROMPT = """You fill in job application form fields using the user's profile data.
 
 You receive: {"experience": {...},"profile": {...}, "fields": [...]}
@@ -57,6 +60,10 @@ Leave "value" as "" (or false / null as appropriate) when no profile data fits a
 OUTPUT: {"fields": [...]} — JSON only, no prose."""
 
 
+# -----
+# Schema for how fields get extracted from input tags on a html web page
+# Change this if you want to change how fields are extracted
+# -----
 POPULATE_FIELDS_SCHEMA = {
     'type': 'object',
     'properties': {

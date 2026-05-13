@@ -3,7 +3,8 @@ import tempfile
 from pathlib import Path
 from quart import Blueprint, request, jsonify, send_file
 import uuid
-from const.approved_skills import approved_skills
+# from const.approved_skills import approved_skills
+from database.queries.get_user_skills import get_user_skils
 
 from ollama import AsyncClient
 # from services.docx_tools import TOOL_SCHEMAS, TOOL_REGISTRY
@@ -54,11 +55,16 @@ async def tailor():
     applicable_paragraphs = await extract_applicable_paragraphs(paragraphs)
 
 
+    # get user skills from database
+    user_skills = get_user_skils()
+    print("user skills:")
+    print(user_skills)
+
     # 2. Process each line for tailoring
         # run list of lines / paragraphs to model to swap ones that match model prompt
             # summary, skills, job titles, bullet points...
     changes_count, model_summary = await tailor_resume_in_place(
-        original_path, output_path, applicable_paragraphs, job_description, approved_skills,
+        original_path, output_path, applicable_paragraphs, job_description, user_skills,
     )
     print("After Model Summary")
 

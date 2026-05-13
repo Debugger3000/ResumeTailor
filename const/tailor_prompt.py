@@ -1,5 +1,9 @@
 
 
+# -----
+# Prompt for paragraph / docx line extraction
+# Change this if you want to change what lines are to be grabbed and changed by the second stage tailoring model call
+# -----
 EXTRACT_INDEXES_PROMPT = """You scan resume paragraphs and identify which ones contain job titles or technology/skill terms. Return JSON only.
 
 INPUT (in user message):
@@ -54,6 +58,10 @@ resume_paragraphs: [
 
 
 
+# -----
+# Prompt for tailoring
+# Change this if you want to change how your resume is tailored
+# -----
 TAILOR_PROMPT = """You rewrite specific parts of a resume to match a job description (JD). You return JSON only.
 
 Input Example:
