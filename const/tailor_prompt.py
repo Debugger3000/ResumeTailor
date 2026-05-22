@@ -72,16 +72,14 @@ applicable_paragraphs: [
   {"index": 7, "original_text": "Skills: JavaScript, MySQL, Docker"}
 ]
 
-You are too only edit indexes contained within applicable_paragraphs
+You are too only edit indexes contained within applicable_paragraphs.
 
 Rules:
-You must swap job titles found on the resume with the one used in the JD.
-Only add skills
-
-You are to swap or add skills from list of approved_skills that match ones in the JD
-You are too swap job titles with one found in the JD
-
-
+You are too:
+Add or swap skills found in applicable_paragraphs with skills from list of approved_skills that match ones in the JD.
+Remove skills found in applicable_paragraphs when they are not found in the JD.
+Swap job titles with one found in the JD.
+Leave all formatting alone.
 
 Output Summary Rule:
 - Briefly state the sections that were changed (e.g., "Summary", "Experience", "Skills"...) and add no extra information
@@ -89,16 +87,15 @@ Output Summary Rule:
 Output Example (JSON only)
 {
   "changes": [
-    {"index": 3, "new_text": "Senior Backend Engineer with 5 years building services in TypeScript and PostgreSQL."},
+    {"index": 3, "new_text": "Backend Engineer with 5 years building services in TypeScript and PostgreSQL."},
     {"index": 7, "new_text": "Skills: TypeScript, PostgreSQL, Docker"}
   ],
-  "summary": "Swapped JavaScript for TypeScript and MySQL for PostgreSQL in Summary and Skills per JD. Updated Summary title to 'Senior Backend Engineer'. Did not add AWS since the JD did not mention it."
+  "summary": "Swapped JavaScript for TypeScript and MySQL for PostgreSQL in Summary and Skills per JD. Updated Summary title to 'Backend Engineer'."
 }
 
 FORBIDDEN (never do these):
 - Never add new bullets, paragraphs, lines, or sections
 - Writing comments, notes, or explanations inside any rewritten text
-- Change formatting
 """
 
 # SCHEMAS for tailor model calls
