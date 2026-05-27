@@ -1,53 +1,40 @@
 
+# WHAT COUNTS AS A TECHNOLOGY/SKILL:
+# - Programming languages: Python, JavaScript, TypeScript, Java, Go, Rust, C++, etc.
+# - Frameworks/libraries: React, Vue, Django, FastAPI, Express, Spring, etc.
+# - Databases: PostgreSQL, MySQL, MongoDB, Redis, etc.
+# - Tools/platforms: Docker, Kubernetes, AWS, Azure, Git, Jenkins, etc.
+# - Concepts that map to skills: REST, GraphQL, CI/CD, Agile, etc.
 
 # -----
 # Prompt for paragraph / docx line extraction
 # Change this if you want to change what lines are to be grabbed and changed by the second stage tailoring model call
 # -----
-EXTRACT_INDEXES_PROMPT = """You scan resume paragraphs and identify which ones contain job titles or technology/skill terms. Return JSON only.
+EXTRACT_INDEXES_PROMPT = """
 
 INPUT (in user message):
 - resume_paragraphs: list of {index, text} objects
 
 YOUR TASK:
 For each paragraph, decide if it contains either:
-- A job title (e.g., "Backend Developer", "Senior Software Engineer", "Full Stack Developer")
-- One or more technology or skill names (e.g., "Python", "React", "PostgreSQL", "AWS", "Docker")
+- A job title (e.g., "Backend Developer", "Software Engineer", "Full Stack Developer", "Software Developer", "Frontend Developer", "Application Developer")
+- One or more technology or skill names (e.g., "Python", "React", "PostgreSQL", "AWS", "Docker", etc...)
 
-Include the paragraph's index in the output if EITHER is true.
-
-WHAT COUNTS AS A JOB TITLE:
-- Role names like "Developer", "Engineer", "Architect", "Analyst", "Designer", "Consultant", "Specialist", "Lead", "Intern"
-- Often paired with seniority words: "Senior", "Junior"
-- Usually a short line, not a full sentence
-
-WHAT COUNTS AS A TECHNOLOGY/SKILL:
-- Programming languages: Python, JavaScript, TypeScript, Java, Go, Rust, C++, etc.
-- Frameworks/libraries: React, Vue, Django, FastAPI, Express, Spring, etc.
-- Databases: PostgreSQL, MySQL, MongoDB, Redis, etc.
-- Tools/platforms: Docker, Kubernetes, AWS, Azure, Git, Jenkins, etc.
-- Concepts that map to skills: REST, GraphQL, CI/CD, Agile, etc.
-
-WHAT DOES NOT COUNT:
-- Names of people, Dates, Company names
-- Email addresses, phone numbers, URLs
-- Section headers like "Skills", "Experience", "Education" (the header itself is not a skill)
-- Generic words like "team", "project", "code" without a specific technology
+If the paragraph index contains a job title or skill / technology name, then it should be passed as output as a JSON object with the following structure (Sort indexes ascending):
 
 OUTPUT (JSON only, no prose):
 {
 "applicable_paragraphs": [
-  {"index": int, "original_text": "..."}, 
+  {"index": int}, 
 ]}
 
-Return only the indexes of paragraphs that contain a job title or skill mention. Sort indexes ascending. If a paragraph contains neither, omit it.
+If a paragraph contains neither, omit it.
 
-EXAMPLE INPUT:
-resume_paragraphs: [
-  {"index": 2, "text": "Backend Developer with 5 years building services in JavaScript and MySQL."},
-  {"index": 4, "text": "Languages: JavaScript, MySQL, Docker, Git"},
-  {"index": 7, "text": "Full Stack Developer"},
-]
+WHAT DOES NOT COUNT:
+- Names of people, Dates, Company names, email addresses, phone numbers, URLs
+- Section headers like "Skills", "Experience", "Education" (the header itself is not a skill)
+- Generic words like "team", "project", "code"
+
 """
 
 # EXAMPLE OUTPUT:
@@ -136,22 +123,39 @@ TAILOR_REPLACE_INDEX_SCHEMA = {
 #     'additionalProperties': False,
 # }
 
+# TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA = {
+#     'type': 'object',
+#     'properties': {
+#         'applicable_paragraphs': {
+#             'type': 'array',
+#             'items': {
+#                 'type': 'object',
+#                 'properties': {
+#                     'index': {'type': 'integer'},
+#                     'original_text': {'type': 'string'},
+#                 },
+#                 'required': ['index', 'original_text'],
+#                 'additionalProperties': False,
+#             },
+#         },
+#     },
+#     'required': ['applicable_paragraphs'],
+#     'additionalProperties': False,
+# }
+
 TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA = {
-    'type': 'object',
-    'properties': {
-        'applicable_paragraphs': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'index': {'type': 'integer'},
-                    'original_text': {'type': 'string'},
+    "type": "object",
+    "properties": {
+        "applicable_paragraphs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "index": {"type": "integer"}
                 },
-                'required': ['index', 'original_text'],
-                'additionalProperties': False,
-            },
-        },
+                "required": ["index"]
+            }
+        }
     },
-    'required': ['applicable_paragraphs'],
-    'additionalProperties': False,
+    "required": ["applicable_paragraphs"]
 }

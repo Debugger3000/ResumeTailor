@@ -59,6 +59,7 @@ async def extract_applicable_paragraphs(
 
     print(f"=== Stage 1 selected {len(applicable)} of {len(paragraphs)} paragraphs ===")
     print(f"=== Selected indexes: {sorted(a['index'] for a in applicable)} ===")
+    print(f"=== Stage 1 applicable_paragraphs returned: {applicable}===")
 
     return applicable
 

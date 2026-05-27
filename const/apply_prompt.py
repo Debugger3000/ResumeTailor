@@ -50,7 +50,10 @@ HOW TO FILL "value":
 
 KIND RULES:
 - select / radio: "value" MUST be one of the option "value" strings. Pick the option whose "label" best matches the profile. No composing.
-- checkbox: true or false. No composing.
+- "combobox": a dropdown.
+  - If "options" is provided (not null), pick from it exactly like select/radio.
+  - If "options" is null, the dropdown loads its options lazily. Provide your best guess as a plain string
+- checkbox: true or false.
 - file: skip
 - text / email / tel / number / url: direct from profile only. No composing.
 - textarea: direct if possible, otherwise compose an answer using real information from the profile.

@@ -68,33 +68,50 @@ async def find_form_target(page: Page):
     Return the Page or Frame that actually contains the form.
     Many ATS/Apply forms are in iframes. This picks the best target.
     """
-    # Apply-frame heuristic for known hosts
-    # apply_hosts = ("smartapply.indeed.com", "indeedapply", "greenhouse.io", "lever.co", "workday")
-    # for frame in page.frames:
-    #     if frame == page.main_frame:
-    #         continue
-    #     if any(host in (frame.url or "") for host in apply_hosts):
-    #         return frame
+    apply_hosts = (
+        "smartapply.indeed.com",
+        "indeedapply",
+        "greenhouse.io",
+        "lever.co",
+        "workday",
+        "ashbyhq.com",
+        "myworkdayjobs.com",
+    )
     
-    # # Fallback: pick whichever frame has the most non-trivial form controls
-    # candidates = [page.main_frame] + [f for f in page.frames if f != page.main_frame]
-    # best = page.main_frame
-    # best_count = 0
+    # Try known apply hosts first
+    for frame in page.frames:
+        if frame == page.main_frame:
+            continue
+        if any(host in (frame.url or "") for host in apply_hosts):
+            # Wait for the form to actually render inside the iframe
+            try:
+                await frame.wait_for_selector(
+                    'input:not([type=hidden]), select, textarea',
+                    timeout=5000,
+                )
+            except Exception:
+                pass
+            return frame
     
-    # for frame in candidates:
-    #     try:
-    #         count = await frame.evaluate("""
-    #             () => document.querySelectorAll(
-    #                 'input:not([type=hidden]):not([type=submit]):not([type=button])'
-    #                 + ':not([name="q"]):not([name="l"]),'
-    #                 + ' select, textarea'
-    #             ).length
-    #         """)
-    #     except Exception:
-    #         count = 0
-    #     if count > best_count:
-    #         best_count = count
-    #         best = frame
+    # Fallback: pick whichever frame has the most non-trivial form controls
+    candidates = [page.main_frame] + [f for f in page.frames if f != page.main_frame]
+    best = page.main_frame
+    best_count = 0
+    
+    for frame in candidates:
+        try:
+            count = await frame.evaluate("""
+                () => document.querySelectorAll(
+                    'input:not([type=hidden]):not([type=submit]):not([type=button])'
+                    + ':not([name="q"]):not([name="l"]),'
+                    + ' select, textarea'
+                ).length
+            """)
+        except Exception:
+            count = 0
+        if count > best_count:
+            best_count = count
+            best = frame
     
     # return best
     return page.main_frame
