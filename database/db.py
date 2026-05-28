@@ -81,8 +81,9 @@ def init_db():
                 can_provide_work_documents INTEGER,
                 non_compete_active INTEGER,
                 previously_employed_here INTEGER,
-                referred_by TEXT,
-                referral_source TEXT,
+                current_country TEXT,
+                eligible_for_work_current_country INTEGER,
+                allow_data_use INTEGER,
                 -- open questions
                 why_this_company TEXT,
                 why_this_role TEXT,
