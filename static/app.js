@@ -725,20 +725,20 @@ const MODEL_CATALOG = [
   { provider: 'ollama', model_name: 'gemma3:27b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 27B' },
   { provider: 'ollama', model_name: 'gemma4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 4 — Google, vision + tools' },
 
-  // ============== ANTHROPIC ==============
-  { provider: 'anthropic', model_name: 'claude-opus-4-7',         host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Opus 4.7 — most capable' },
-  { provider: 'anthropic', model_name: 'claude-sonnet-4-6',       host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Sonnet 4.6 — balanced' },
-  { provider: 'anthropic', model_name: 'claude-haiku-4-5',        host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Haiku 4.5 — fast & cheap' },
-
-  // ============== OPENAI ==============
-  { provider: 'openai',    model_name: 'gpt-5',                   host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-5 — flagship' },
-  { provider: 'openai',    model_name: 'gpt-5-mini',              host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-5 Mini — fast & cheap' },
-  { provider: 'openai',    model_name: 'gpt-4o',                  host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-4o — multimodal' },
-
   // ============== GOOGLE ==============
-  { provider: 'google',    model_name: 'gemini-2.5-pro',          host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud · Google', desc: 'Gemini 2.5 Pro — flagship' },
   { provider: 'google',    model_name: 'gemini-2.5-flash',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud · Google', desc: 'Gemini 2.5 Flash — fast' },
 ];
+
+// ============== ANTHROPIC ==============
+//   { provider: 'anthropic', model_name: 'claude-opus-4-7',         host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Opus 4.7 — most capable' },
+//   { provider: 'anthropic', model_name: 'claude-sonnet-4-6',       host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Sonnet 4.6 — balanced' },
+//   { provider: 'anthropic', model_name: 'claude-haiku-4-5',        host: 'https://api.anthropic.com', api_key_env: 'ANTHROPIC_API_KEY', category: 'Cloud · Anthropic', desc: 'Claude Haiku 4.5 — fast & cheap' },
+// // ============== OPENAI ==============
+//   { provider: 'openai',    model_name: 'gpt-5',                   host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-5 — flagship' },
+//   { provider: 'openai',    model_name: 'gpt-5-mini',              host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-5 Mini — fast & cheap' },
+//   { provider: 'openai',    model_name: 'gpt-4o',                  host: 'https://api.openai.com',    api_key_env: 'OPENAI_API_KEY',    category: 'Cloud · OpenAI',    desc: 'GPT-4o — multimodal' },
+
+
 
 const PROVIDER_NEEDS_KEY = (provider) => provider !== 'ollama';
 let currentModelConfig = null;   // module-level cache of the saved row

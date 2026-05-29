@@ -4,6 +4,35 @@ from google import genai
 from google.genai import types
 
 
+
+def _to_gemini_schema(node: dict) -> types.Schema:
+    type_map = {
+        "object": types.Type.OBJECT,
+        "array": types.Type.ARRAY,
+        "string": types.Type.STRING,
+        "integer": types.Type.INTEGER,
+        "number": types.Type.NUMBER,
+        "boolean": types.Type.BOOLEAN,
+    }
+    t = node["type"]
+    kwargs = {"type": type_map[t]}
+
+    if t == "object":
+        kwargs["properties"] = {
+            k: _to_gemini_schema(v) for k, v in node.get("properties", {}).items()
+        }
+        if "required" in node:
+            kwargs["required"] = node["required"]
+    elif t == "array":
+        kwargs["items"] = _to_gemini_schema(node["items"])
+
+    if "enum" in node:
+        kwargs["enum"] = node["enum"]
+    if "description" in node:
+        kwargs["description"] = node["description"]
+
+    return types.Schema(**kwargs)
+
 class GeminiClient:
     def __init__(self):
         self._client: genai.Client | None = None
@@ -45,7 +74,8 @@ class GeminiClient:
         # Note: Gemini's response_schema is an OpenAPI subset, not full JSON Schema.
         if schema is not None:
             config_kwargs["response_mime_type"] = "application/json"
-            config_kwargs["response_schema"] = schema
+            # convert my schema to schema that gemini needs
+            config_kwargs["response_schema"] = _to_gemini_schema(schema)
 
         resp = await self._client.aio.models.generate_content(
             model=self.model,
