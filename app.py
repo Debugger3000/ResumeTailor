@@ -7,10 +7,12 @@ from blueprints.tailor import tailor_bp
 from blueprints.apply import apply_bp
 from blueprints.data import data_bp
 from services.ai_model_control.run_local_model import start_ollama
+from services.ai_model_control.run_cloud_model import start_cloud_model
 from database.db import init_db
 from services.ai_model_control.helpers import is_model_listed, is_model_local
 from database.queries.ai_models import get_model_config
 from services.ai_model_control.ollama_client import ollama_client
+from services.ai_model_control.gemini_client import gemini_client 
 # Run Devleopment
 # hypercorn app:app -c hypercorn.toml --reload
 
@@ -46,9 +48,11 @@ async def _startup():
                 ollama_client.configure(model)
             # run local model and connect to it
                 start_ollama(model)
-        # else:
-            # connect to cloud model...
-            # is cloud model
+            else:
+                # connect to cloud model...
+                # is cloud model
+                gemini_client.configure(model)
+                start_cloud_model(model)
 
 
 

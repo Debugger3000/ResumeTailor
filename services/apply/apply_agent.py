@@ -3,17 +3,11 @@ import os
 import time
 from ollama import AsyncClient
 
-
-
 from const.apply_prompt import APPLY_PROMPT, POPULATE_FIELDS_SCHEMA
 #from const.personal_info import PROFILE  # adjust import to wherever your profile lives
 from services.ai_model_control.ollama_client import ollama_client
 from services.apply.apply_helpers import get_full_user_data
-
-# ollama_client = AsyncClient(host=os.getenv('OLLAMA_HOST', 'http://localhost:11434'))
-# OLLAMA_MODEL = os.getenv('OLLAMA_MODEL')
-
-
+from services.ai_model_control.helpers import run_model
 
 
 
@@ -29,27 +23,32 @@ async def populate_field_values(fields: list[dict]) -> tuple[list[dict], float]:
         'fields': fields,
     })
 
-    print(f"=== populate_field_values: input size {len(user_prompt)} chars, {len(fields)} fields ===")
-    start = time.time()
+    # print(f"=== populate_field_values: input size {len(user_prompt)} chars, {len(fields)} fields ===")
+    # start = time.time()
 
-    response = await ollama_client.chat(
-        model=ollama_client.model,
-        messages=[
-            {'role': 'system', 'content': APPLY_PROMPT},
-            {'role': 'user', 'content': user_prompt},
-        ],
-        format=POPULATE_FIELDS_SCHEMA,
-        options={'temperature': 0.0},
-    )
+    # response = await ollama_client.chat(
+    #     model=ollama_client.model,
+    #     messages=[
+    #         {'role': 'system', 'content': APPLY_PROMPT},
+    #         {'role': 'user', 'content': user_prompt},
+    #     ],
+    #     format=POPULATE_FIELDS_SCHEMA,
+    #     options={'temperature': 0.0},
+    # )
 
-    elapsed = time.time() - start
+    try:
+        parsed, elapsed = await run_model(APPLY_PROMPT, user_prompt, POPULATE_FIELDS_SCHEMA)
+    except json.JSONDecodeError as e:
+        print(f"=== run_model call: POPULATE FIELDS JSON DECODE ERROR: {e} ===")
+        return fields, 0.0          
+
     # raw_content = response['message']['content']
     print(f"=== populate_field_values returned in {elapsed:.1f}s ===")
-    print(f"=== RAW OUTPUT: {response[:2000]} ===")
+    # print(f"=== RAW OUTPUT: {response[:2000]} ===")
 
 
     try:
-        parsed = json.loads(response)
+        # parsed = json.loads(response)
         populated = parsed.get('fields', [])
     except json.JSONDecodeError as e:
         print(f"=== POPULATE FIELDS JSON DECODE ERROR: {e} ===")

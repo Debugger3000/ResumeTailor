@@ -2,6 +2,12 @@
 from database.queries.ai_models import get_model_config
 from const.ai_models import ModelProvider, OllamaStatus
 import requests
+from services.ai_model_control.claude_client import claude_client
+from services.ai_model_control.ollama_client import ollama_client
+from services.ai_model_control.gemini_client import gemini_client
+import json
+import time
+from database.queries.ai_models import get_model_config
 
 def is_model_listed() -> bool:
     model = get_model_config()
@@ -53,3 +59,45 @@ def ollama_status(model: ModelProvider) -> OllamaStatus:
     except Exception as e:
         return {**base, "running": False, "loaded_models": [], "error": str(e)}
 
+
+
+# Call current model for use 
+# return structured json data
+# ai/inference.py
+
+
+
+async def run_model(system_prompt: str, user_content: str, schema: dict) -> tuple[dict, float]:
+
+    model = get_model_config()
+    if not model:
+        raise RuntimeError("No model configured")
+
+    messages = [
+        {'role': 'system', 'content': system_prompt},
+        {'role': 'user',   'content': user_content},
+    ]
+
+    print(f"=== run_structured: provider={model.get('provider')}, "
+          f"input {len(user_content)} chars ===")
+    start = time.time()
+
+    if is_model_local(model.get('provider')):
+        response = await ollama_client.chat(
+            model=ollama_client.model,
+            messages=messages,
+            format=schema,
+            options={'temperature': 0.0},
+        )
+        #parsed = json.loads(response['message']['content'])   # may raise JSONDecodeError
+        parsed = json.loads(response)
+    else:
+        # parsed = await claude_client.chat(messages=messages, schema=schema)  # returns dict
+        print(f"=== run_model parsed: {model.get('api_key_env')} ===")
+        parsed = await gemini_client.chat(messages=messages, schema=schema)  # returns dict
+
+
+    elapsed = time.time() - start
+    print(f"=== run_structured returned in {elapsed:.1f}s ===")
+    print(f"=== run_model parsed: {parsed} ===")
+    return parsed, elapsed

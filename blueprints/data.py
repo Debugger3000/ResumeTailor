@@ -10,7 +10,10 @@ from services.apply.apply_agent import get_full_user_data
 from database.queries.experience import get_user_experience, create_user_experience, patch_user_experience, delete_user_experience
 from services.ai_model_control.helpers import ollama_status, is_model_local
 from services.ai_model_control.run_local_model import stop_ollama, start_ollama
+from services.ai_model_control.run_cloud_model import start_cloud_model
 from services.ai_model_control.ollama_client import ollama_client
+from services.ai_model_control.gemini_client import gemini_client
+
 # blueprint - route name is 'tailor'
 data_bp = Blueprint('data', __name__)
 
@@ -99,6 +102,9 @@ async def save_model():
     host        = (body.get('host') or '').strip() or None
     api_key_env = (body.get('api_key_env') or None)
 
+    print("api key for cloud modellll")
+    print(api_key_env)
+
     # make sure provider names are correct...
     if provider not in ('ollama', 'anthropic', 'openai', 'google'):
         return {"ok": False, "error": "Invalid provider"}, 400
@@ -132,6 +138,9 @@ async def updated_model_run():
             ollama_client.configure(model)
             start_ollama(model)
         # else: cloud — nothing to restart, config is enough
+        else:
+            gemini_client.configure(model)
+            start_cloud_model(model)
 
         return {"ok": True}
     except Exception as e:

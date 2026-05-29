@@ -829,25 +829,32 @@ async function saveModelConfig() {
   // Allow user-overridden host (port-only or full URL)
   const hostInput = document.getElementById('ollamaHost');
   const host = hostInput?.value.trim() || entry.host;
+  const modelApiKey = document.getElementById('apiKeyInput');
+  const apiKey = modelApiKey?.value.trim();
+
 
   const payload = {
     provider:    entry.provider,
     model_name:  entry.model_name,
     host:        host,
-    api_key_env: entry.api_key_env,   // env var NAME, not the key itself
+    api_key_env: apiKey,   // env var NAME, not the key itself
   };
+
+  console.log(`Payload for model save config POST Pre- before: ${payload}`);
+  console.log(`Payload for model save config POST Pre- before: ${payload}`);
 
   // For cloud, the actual API key gets sent alongside (server stores it in env / vault,
   // and writes the env-var name to the DB)
-  if (PROVIDER_NEEDS_KEY(entry.provider)) {
-    payload.api_key = document.getElementById('apiKeyInput').value.trim();
-  }
+  // if (PROVIDER_NEEDS_KEY(entry.provider)) {
+  //   payload.api_key = document.getElementById('apiKeyInput').value.trim();
+  // }
 
   saveBtn.disabled = true;
   status.textContent = 'Saving…';
   status.className = 'status';
 
   try {
+    console.log(`Payload for model save config POST: ${payload}`);
     const res = await fetch('/api/data/model', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },

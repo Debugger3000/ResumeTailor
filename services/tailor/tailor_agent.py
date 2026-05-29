@@ -6,6 +6,7 @@ from ollama import AsyncClient
 from const.tailor_prompt import TAILOR_PROMPT, EXTRACT_INDEXES_PROMPT, TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA, TAILOR_REPLACE_INDEX_SCHEMA
 import time
 from services.ai_model_control.ollama_client import ollama_client
+from services.ai_model_control.helpers import run_model
 
 # ollama_client = AsyncClient(host=os.getenv('OLLAMA_HOST', 'http://localhost:11434'))
 # OLLAMA_MODEL = os.getenv('OLLAMA_MODEL')
@@ -26,22 +27,28 @@ async def extract_applicable_paragraphs(
     print(f"=== Stage 1: extracting applicable indexes. Input size: {len(user_prompt)} chars ===")
     start = time.time()
 
-    response = await ollama_client.chat(
-        model=ollama_client.model,
-        messages=[
-            {'role': 'system', 'content': EXTRACT_INDEXES_PROMPT},
-            {'role': 'user', 'content': user_prompt},
-        ],
-        format=TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA,
-        options={'temperature': 0.0},
-    )
-
-    elapsed = time.time() - start
-    print(f"=== Stage 1 returned in {elapsed:.1f}s ===")
-    print(f"=== RAW STAGE 1 OUTPUT: {response} ===")
+    # response = await ollama_client.chat(
+    #     model=ollama_client.model,
+    #     messages=[
+    #         {'role': 'system', 'content': EXTRACT_INDEXES_PROMPT},
+    #         {'role': 'user', 'content': user_prompt},
+    #     ],
+    #     format=TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA,
+    #     options={'temperature': 0.0},
+    # )
 
     try:
-        parsed = json.loads(response)
+        parsed, elapsed = await run_model(EXTRACT_INDEXES_PROMPT, user_prompt, TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA)
+    except json.JSONDecodeError as e:
+        print(f"=== run_model call: tailor resume in place JSON DECODE ERROR: {e} ===")
+        return {'index': -1, 'text': 'run_model failed at extract_applicable_paragraphs...'} 
+
+    # elapsed = time.time() - start
+    print(f"=== Stage 1 returned in {elapsed:.1f}s ===")
+    print(f"=== RAW STAGE 1 OUTPUT: {parsed} ===")
+
+    try:
+        # parsed = json.loads(response)
         items = parsed.get('applicable_paragraphs', [])
     except json.JSONDecodeError as e:
         print(f"=== STAGE 1 JSON DECODE ERROR: {e} ===")
@@ -62,60 +69,6 @@ async def extract_applicable_paragraphs(
     print(f"=== Stage 1 applicable_paragraphs returned: {applicable}===")
 
     return applicable
-
-
-
-# async def extract_applicable_paragraphs(
-#     paragraphs: list[dict],
-# ) -> list[dict]:
-#     """
-#     Stage 1: Ask the model to identify which paragraphs contain job titles
-#     or technology/skill mentions. Returns the filtered list of paragraphs
-#     that stage 2 should consider editing.
-#     """
-#     user_prompt = json.dumps({
-#         'resume_paragraphs': [
-#             {'index': p['index'], 'text': p['text']} for p in paragraphs
-#         ],
-#     })
-
-#     print(f"=== Stage 1: extracting applicable indexes. Input size: {len(user_prompt)} chars ===")
-#     start = time.time()
-
-#     response = await ollama_client.chat(
-#         model=ollama_client.model,
-#         messages=[
-#             {'role': 'system', 'content': EXTRACT_INDEXES_PROMPT},
-#             {'role': 'user', 'content': user_prompt},
-#         ],
-#         format=TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA,
-#         options={'temperature': 0.0},
-#     )
-
-#     elapsed = time.time() - start
-#     #raw_content = response['message']['content']
-#     print(f"=== Stage 1 returned in {elapsed:.1f}s ===")
-#     print(f"=== RAW STAGE 1 OUTPUT: {response} ===")
-
-#     try:
-#         parsed = json.loads(response)
-#         indexes = parsed.get('indexes', [])
-#     except json.JSONDecodeError as e:
-#         print(f"=== STAGE 1 JSON DECODE ERROR: {e} ===")
-#         indexes = []
-
-#     # Sanity check: drop any indexes the model hallucinated
-#     valid_indexes = {p['index'] for p in paragraphs}
-#     indexes = [i for i in indexes if i in valid_indexes]
-
-#     # Filter the original paragraph list down to only the flagged indexes
-#     index_set = set(indexes)
-#     filtered = [p for p in paragraphs if p['index'] in index_set]
-
-#     print(f"=== Stage 1 selected {len(filtered)} of {len(paragraphs)} paragraphs ===")
-#     print(f"=== Selected indexes: {sorted(index_set)} ===")
-
-#     return filtered
 
 
 
@@ -151,28 +104,36 @@ async def tailor_resume_in_place(
     print(f"=== Calling model. Input prompt size: {len(user_prompt)} chars ===")
     print(f"Input prompt: {user_prompt}")
     print(f"Input prompt: {job_description}")
-    start = time.time()
+    # start = time.time()
 
     # get running ollama client and give list of paragraphs to change...
-    response = await ollama_client.chat(
-        model=ollama_client.model,
-        messages=[
-            {'role': 'system', 'content': TAILOR_PROMPT},
-            {'role': 'user', 'content': user_prompt},
-        ],
-        format=TAILOR_REPLACE_INDEX_SCHEMA,
-        options={'temperature': 0.0},
-    )
+    # response = await ollama_client.chat(
+    #     model=ollama_client.model,
+    #     messages=[
+    #         {'role': 'system', 'content': TAILOR_PROMPT},
+    #         {'role': 'user', 'content': user_prompt},
+    #     ],
+    #     format=TAILOR_REPLACE_INDEX_SCHEMA,
+    #     options={'temperature': 0.0},
+    # )
 
-    elapsed = time.time() - start
+    
+
+    try:
+        parsed, elapsed = await run_model(TAILOR_PROMPT, user_prompt, TAILOR_REPLACE_INDEX_SCHEMA)
+    except json.JSONDecodeError as e:
+        print(f"=== run_model call: tailor resume in place JSON DECODE ERROR: {e} ===")
+        return -1, 0.0   
+
+    # elapsed = time.time() - start
     #raw_content = response['message']['content']
-    print(f"=== Model returned in {elapsed:.1f}s. Output size: {len(response)} chars ===")
+    print(f"=== Model returned in {elapsed:.1f}s. Output size: {len(parsed)} chars ===")
     print("=== RAW OUTPUT ===")
-    print(response[:3000])
+    # print(response[:3000])
     print("=== END RAW OUTPUT ===")
 
     try:
-        parsed = json.loads(response)
+        # parsed = json.loads(response)
         changes = parsed.get('changes', [])
         summary = parsed.get('summary', '')
     except json.JSONDecodeError as e:
