@@ -2,7 +2,7 @@
 
 # JobPilot
 
-### Your local AI agent for Resume Tailoring and Form Completion
+### Your AI agent for Resume Tailoring and Form Completion
 
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -18,61 +18,72 @@
 
 ## 📖 Chapters
 - [What does this application do?](#-what-does-this-application-do)
-- [Why use this?](#-why-use-this)
 - [Requirements](#-requirements)
+- [Application Information](#application-information)
 - [How to Use](#-how-to-use)
 - [Commands](#-commands)
-- [Performance & Benchmarks](#-performance--benchmarks)
 - [Notes](#-notes)
 - [License](#-license)
 
 
 ## 📝 What does this application do?
 
-Automate Resume Tailoring and Form Completion for job applications.
+Automate Resume Tailoring and Form Completion with the click of a button!
 
 ### Resume Tailoring
-Give your resume and a job description, and let the model do the work. Swapping skills and synonymous job titles, so you don't have to.
+Tailor your resume by providing a job description and an upload of your .docx resume. Provide skills and the model will swap job titles and skills as you see fit.
 
 ### Form Completion
-Navigate to a page with form fields and let the model fill in everything for you.
+Fill in long application forms with the click of a button. Personal info, skills, experience, and all the other boring fields that each job application asks for.
 
 
-## 💡 Why use this?
 
-If you find the job application process stressful and painful, and want to make it easier for yourself.
-
-> **The main takeaway** — it's a numbers game. Across tens or hundreds of applications, this saves you hours of time and thousands of keystrokes and clicks. Automate the repetitive tasks such as tailoring a new resume for each job, and filling out the same forms again and again.
-
-| | |
-|---|---|
-| **Free** | No monthly fees or token costs |
-| **Open Source** | Change the model prompts, swap models, add features — make it yours |
-| **Save Time** | Cut down each application's time with minimal grunt work |
-| **Save Clicks** | Click once and let the work be done for you |
-| **Save Sanity** | Automate the tedious parts of applying |
 
 
 ## 💻 Requirements
 
-Hardware dependent since this project mainly utilizes a local model, which needs a decent computer.
+**You are required** to configure either a local Ollama model or a Cloud model (Gemini - free api).
 
-> **Cloud model connection coming soon...**
+**Be mindful** that while local models are data secure they require good hardware to run quickly. 
 
-| Requirement | Details |
+| System Requirements | Details |
 |---|---|
 | **OS** | Windows 10+ |
-| **System Specs** | [Ollama System Requirements Guide](https://localaimaster.com/blog/ollama-system-requirements) |
-| **Ollama** | [Download & Install](https://ollama.com/download) |
-| **Local Model** | A compatible LLM via Ollama (e.g. `llama3` or `qwen3:8b`) — [Browse Models](https://ollama.com/library) |
 | **Python** | 3.10 or higher — [Download](https://www.python.org/downloads/) |
 | **Node.js** | 22 or higher — [Download](https://nodejs.org/) |
+
+| Models | Details |
+|---|---|
+| **Local Model** | --- |
+| --- | [Download & Install](https://ollama.com/download) |
+| --- | A compatible LLM via Ollama (e.g. `llama3` or `qwen3:8b`) — [Browse Models](https://ollama.com/library) |
+| **Cloud Model** | --- |
+| --- | [Configure Gemini API](https://aistudio.google.com/) |
+
+## Application Information
+
+### Model Use
+- As stated above, you have to use either a local or cloud model.
+- *Cloud model support limited to free Gemnini 2.5 Fast*
+
+### Open-Source
+- You might want to add columns to the user_profile database table for more coverage on forms. Or anything else within the database schema.
+- You can alter Model prompts for how tailoring or apply model calls work.
+- Anything else you want.
+
+### Default Model Configuration
+- *You can alter these prompts to tell the model what logic you want it to execute*
+- **Tailoring Model:** The Tailoring prompts are by default configured to swap out job titles and skills.
+- **Form/Apply Model:** The Apply/Form prompts are by default configured to simply fill in all fields it has the information for, pulling from personal
+
+### Data
+- All data is stored locally via SQLite.
 
 
 
 ## 🚦 How to Use
 
-**1.** Install Ollama and pull your preferred model (see Requirements).
+**1.** Configure a model to use.
 
 **2.** Clone this repo:
 ```bash
@@ -85,20 +96,14 @@ git clone https://github.com/Debugger3000/ResumeTailor
 
 **5.** Open your browser to `http://127.0.0.1:8000`.
 
-**6.** Select the model you pulled in config — and voilà, you're good to go! 🎉
+**5.** Configure model, skills, and personal info on web page.
 
+**6.** You're good to go! You can now tailor resumes and auto fill forms with the click of a button. 
 
 
 ## 🔧 Commands
 
-### Ollama
-
-Download an Ollama model (pick one that fits your system):
-```bash
-ollama pull qwen3:8b
-```
-
-### Setup & Run
+### Dependencies and Run
 
 Install client-side JS dependencies:
 ```bash
@@ -117,28 +122,21 @@ hypercorn app:app -c hypercorn.toml
 
 
 
-## 📊 Performance & Benchmarks
-
-Performance varies based on your hardware and chosen model. Below are benchmarks from my own development machine.
-
-### Model Completion Times
-
-| Model | Resume Tailoring | Form Completion | Notes |
-|-------|:---:|:---:|-------|
-| `qwen3:8b` | ~25s | ~22s | **Recommended** — best balance of speed and quality |
-| `llama3:8b` | ~30s | ~28s | Faster, slightly less accurate on technical resumes |
-| `qwen3:14b` | ~35s | ~20s | Higher quality output, needs more VRAM |
-| `mistral:7b` | ~24s | ~23s | Fastest, lighter quality |
-
-
 ## 📌 Notes
 
-- **Resume format:** Multi-column resumes have not been tested and likely won't work well. A single-column layout is recommended (for this app, and in general).
+- **Resume format:** Multi-column resumes have not been tested and likely won't work well. A single-column layout is recommended.
 - **Model completion times can vary due to:**
   - Local model used — reasoning models are recommended
   - Long job descriptions — paste only what the model needs (job title, skills, etc.)
   - Large webpages with many form fields
 - **Tested on Windows 11.** Not currently supported on macOS or Linux.
+
+### Model Config (What you can change)
+- **You can alter these prompts to tell the model what logic you want it to execute**
+- **Tailoring Model:** The Tailoring prompts are by default configured to swap out job titles and skills.
+- **Form/Apply Model:** The Apply/Form prompts are by default configured to simply fill in all fields it has the information for, pulling from personal 
+
+
 
 
 ## 📜 License
