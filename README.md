@@ -74,7 +74,7 @@ Fill in long application forms with the click of a button. Personal info, skills
 ### Default Model Configuration
 - *You can alter these prompts to tell the model what logic you want it to execute*
 - **Tailoring Model:** The Tailoring prompts are by default configured to swap out job titles and skills.
-- **Form/Apply Model:** The Apply/Form prompts are by default configured to simply fill in all fields it has the information for, pulling from personal
+- **Form/Apply Model:** The Apply/Form prompts are by default configured to simply fill in all fields it has the information for, pulling from all database tables such as personal info, skills and experience.
 
 ### Data
 - All data is stored locally via SQLite.
