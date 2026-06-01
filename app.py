@@ -14,12 +14,17 @@ from database.queries.ai_models import get_model_config
 from services.ai_model_control.ollama_client import ollama_client
 from services.ai_model_control.gemini_client import gemini_client 
 
-# Run scripts
-# ------
-# Run Devleopment - Windows
+
+# ---
+# Run commands
+# ---
+# Windows
 # hypercorn app:app -c hypercorn.toml --reload
-# Run - Linux with (.venv)
+
+# Linux / Mac with (.venv)
+# activate virtual environment - `source .venv/bin/activate`
 # ./.venv/bin/hypercorn app:app hypercorn.toml
+# deactivate - `deactivate`
 
 
 
