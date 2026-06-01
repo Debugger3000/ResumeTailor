@@ -13,8 +13,15 @@ from services.ai_model_control.helpers import is_model_listed, is_model_local
 from database.queries.ai_models import get_model_config
 from services.ai_model_control.ollama_client import ollama_client
 from services.ai_model_control.gemini_client import gemini_client 
-# Run Devleopment
+
+# Run scripts
+# ------
+# Run Devleopment - Windows
 # hypercorn app:app -c hypercorn.toml --reload
+# Run - Linux with (.venv)
+# ./.venv/bin/hypercorn app:app hypercorn.toml
+
+
 
 # App instance var
 app = Quart(__name__)

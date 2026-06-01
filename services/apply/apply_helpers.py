@@ -16,8 +16,9 @@ def get_full_user_data() -> dict:
     Aggregate user data from all sources into a single flat-ish dict
     suitable for passing to the model.
     """
+    print(get_user_profile())
     return {
-        "profile": get_user_profile(),         # spread profile keys at top level
+        **get_user_profile(),          # Flattens keys
         "experience": get_work_experience(),
         "skills": get_user_skills(),
     }
@@ -36,6 +37,8 @@ async def fill_fields(page_or_frame, fields: list[dict]) -> dict:
         "errors": [{"agent_id": str, "question": str, "error": str}, ...]
       }
     """
+    print("fields before fill_fields processes.......")
+    print(fields)
     results = {"filled": 0, "skipped": 0, "errors": []}
     
     print(f"=== fill_fields: processing {len(fields)} fields ===")
@@ -90,12 +93,32 @@ async def fill_one(page_or_frame, field: dict) -> None:
         await radio.scroll_into_view_if_needed(timeout=5000)
         await radio.check()
         return
+
+    # --- PRECISION FIX FOR ASHBY TOGGLES - stupid checkbox html structure ---
+    if kind == "ashby_toggle_yes_no":
+        normalized_value = str(value).strip().lower()
+        if normalized_value in ("on", "true", "yes"):
+            target_text = "Yes"
+        elif normalized_value in ("off", "false", "no", ""):
+            target_text = "No"
+        else:
+            target_text = str(value) # Fallback to literal if it's somehow different
+
+        # Target the button matching our text choice
+        toggle_button = page_or_frame.locator(
+            f'button[data-agent-id="{agent_id}"]', 
+            has_text=target_text
+        )
+        await toggle_button.scroll_into_view_if_needed(timeout=5000)
+        await toggle_button.click()
+        return
     
-    # Non-radio: agent_id is unique, normal locator path
-    locator = page_or_frame.locator(f'[data-agent-id="{agent_id}"]')
-    await locator.scroll_into_view_if_needed(timeout=5000)
+    
     
     if kind in ("text", "email", "tel", "textarea", "number", "url", "password"):
+        # Non-radio: agent_id is unique, normal locator path
+        locator = page_or_frame.locator(f'[data-agent-id="{agent_id}"]')
+        await locator.scroll_into_view_if_needed(timeout=5000)
         await locator.fill(str(value))
     elif kind == "select":
         await locator.select_option(value=str(value))
@@ -532,6 +555,7 @@ async def get_form_frame(page):
 #     return fields
 
 
+
 async def extract_form_fields(page_or_frame) -> list[dict]:
     """Walk the DOM, return one dict per input. Radio groups are collapsed into single fields."""
     fields = await page_or_frame.evaluate("""
@@ -540,6 +564,13 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
 
             // ---- honeypot detection ----
             function isLikelyHoneypot(el) {
+                // PRECISION PATCH: If it's a standard named checkbox/radio framework element,
+                // do NOT treat it as a honeypot just because it's visually hidden or sized 0.
+                if ((el.type === 'checkbox' || el.type === 'radio') && el.name) {
+                    if (el.getAttribute('aria-hidden') === 'true') return true;
+                    return false; 
+                }
+
                 const cs = getComputedStyle(el);
 
                 if (cs.display === 'none') return true;
@@ -590,6 +621,16 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
             function detectKind(el) {
                 if (el.tagName === 'SELECT') return 'select';
                 if (el.tagName === 'TEXTAREA') return 'textarea';
+                
+                // PRECISION PATCH: If it's a checkbox hidden inside a Yes/No toggle wrapper, 
+                // treat its functional kind as a radio/toggle group so the AI handles choices properly.
+
+                // handle checkboxes that use buttons as clickable elements...
+                if (el.type === 'checkbox' && el.parentElement && el.parentElement.querySelector('button')) {
+                    return 'ashby_toggle_yes_no';
+                }
+                if (el.type === 'checkbox') return 'checkbox';
+
                 const role = el.getAttribute('role');
                 if (role === 'combobox') return 'combobox';
                 // aria-haspopup=listbox without role=combobox is also a dropdown
@@ -649,7 +690,7 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
                     );
                     for (const c of candidates) {
                         if (c.contains(el)) continue;
-                        if (c.querySelector('input, select, textarea')) continue;
+                        if (c.querySelector('input:not([type=checkbox]):not([type=radio]), select, textarea')) continue;
                         const text = c.innerText ? c.innerText.trim() : '';
                         if (text && text.length < 300) return text;
                     }
@@ -698,6 +739,7 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
             }
 
             // ---- pass 1: non-radio inputs ----
+            // PRECISION PATCH: Included checkboxes directly inside pass 1 selection query
             const nonRadios = document.querySelectorAll(
                 'input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=radio]),'
                 + ' select, textarea'
@@ -730,9 +772,19 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
                         .map(o => ({ value: o.value, label: o.text.trim() }))
                         .filter(o => o.value);
                 } else if (kind === 'combobox') {
-                    // May be null if options load lazily — that's expected;
-                    // fill-time logic will open the dropdown to discover them
                     options = findComboboxOptions(el);
+                } 
+                // PRECISION PATCH: If this is an Ashby style pseudo-checkbox, map neighboring buttons to choices
+                else if (el.type === 'checkbox' && el.parentElement) {
+                    const siblingButtons = el.parentElement.querySelectorAll('button');
+                    if (siblingButtons.length > 0) {
+                        // Tag sibling buttons with the same data-agent-id so Playwright can click them seamlessly
+                        siblingButtons.forEach(btn => btn.setAttribute('data-agent-id', agentId));
+                        options = Array.from(siblingButtons).map(b => ({
+                            value: b.innerText.trim(),
+                            label: b.innerText.trim()
+                        }));
+                    }
                 }
 
                 results.push({

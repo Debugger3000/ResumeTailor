@@ -8,6 +8,7 @@ from services.ai_model_control.gemini_client import gemini_client
 import json
 import time
 from database.queries.ai_models import get_model_config
+import re
 
 def is_model_listed() -> bool:
     model = get_model_config()
@@ -86,11 +87,33 @@ async def run_model(system_prompt: str, user_content: str, schema: dict) -> tupl
         response = await ollama_client.chat(
             model=ollama_client.model,
             messages=messages,
-            format=schema,
-            options={'temperature': 0.0},
+            #format=schema,
+            options={
+            'temperature': 0.0,
+            },
         )
-        #parsed = json.loads(response['message']['content'])   # may raise JSONDecodeError
-        parsed = json.loads(response)
+
+
+        if isinstance(response, str):
+            raw_text = response
+        else:
+            raw_text = getattr(response, 'message', response).content if hasattr(response, 'message') else str(response)
+
+        raw_text = raw_text.strip()
+
+        print(f"--- DEBUG: Raw model text received ({len(raw_text)} chars) ---")
+        
+        # Regex extraction to grab whatever is inside curly or straight brackets if it added fluff
+        json_match = re.search(r'(\{.*\}|\[.*\])', raw_text, re.DOTALL)
+        if json_match:
+            raw_text = json_match.group(1)
+
+        try:
+            parsed = json.loads(raw_text)
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON Parse failed on text:\n{raw_text}")
+            # Return an empty answers structure matching your schema type so the loop doesn't blow up
+            parsed = {"answers": []}
     else:
         # parsed = await claude_client.chat(messages=messages, schema=schema)  # returns dict
         print(f"=== run_model parsed: {model.get('api_key_env')} ===")

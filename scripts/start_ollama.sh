@@ -7,16 +7,17 @@ OLLAMA_HOST_ARG=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -Model|--model)
+        # Support both capitalized and lowercased flag versions safely
+        -Model|-model|--model)
             MODEL="${2:-}"
             shift 2
             ;;
-        -OllamaHost|--host)
+        -OllamaHost|-Ollamahost|-ollamahost|-host|--host)
             OLLAMA_HOST_ARG="${2:-}"
             shift 2
             ;;
         *)
-            echo "Unknown argument: $1" >&2
+            echo "Unknown argument encountered: $1" >&2
             exit 2
             ;;
     esac

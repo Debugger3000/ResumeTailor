@@ -14,8 +14,17 @@ def _to_gemini_schema(node: dict) -> types.Schema:
         "number": types.Type.NUMBER,
         "boolean": types.Type.BOOLEAN,
     }
-    t = node["type"]
-    kwargs = {"type": type_map[t]}
+    
+    raw_type = node.get("type")
+    
+    if isinstance(raw_type, list):
+        core_types = [x for x in raw_type if x != "null"]
+        t = core_types[0] if core_types else "string"
+    else:
+        t = raw_type
+
+    gemini_type = type_map.get(t, types.Type.STRING)
+    kwargs = {"type": gemini_type}
 
     if t == "object":
         kwargs["properties"] = {
@@ -23,6 +32,14 @@ def _to_gemini_schema(node: dict) -> types.Schema:
         }
         if "required" in node:
             kwargs["required"] = node["required"]
+            
+        # --- FIX: Pass down dynamic mapping constraints to the SDK schema config ---
+        if "additionalProperties" in node:
+            if isinstance(node["additionalProperties"], dict):
+                kwargs["additional_properties"] = _to_gemini_schema(node["additionalProperties"])
+            else:
+                kwargs["additional_properties"] = node["additionalProperties"]
+                
     elif t == "array":
         kwargs["items"] = _to_gemini_schema(node["items"])
 
