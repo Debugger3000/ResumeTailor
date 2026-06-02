@@ -895,3 +895,47 @@ button.loading {
   cursor: not-allowed;
   opacity: 0.85;
 }
+
+
+.model-toggle {
+  position: relative;
+  display: inline-flex;
+  background: #020617;            /* same as inputs */
+  border: 1px solid #1e293b;
+  border-radius: 999px;
+  padding: 3px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+.model-toggle-option {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-width: 84px;
+  border: 0;
+  background: transparent;
+  color: #64748b;                 /* idle, matches tabs */
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.model-toggle-option:hover:not(.active):not(:disabled) { color: #a5b4fc; }
+.model-toggle-option.active   { color: #f8fafc; }
+.model-toggle-option:disabled { opacity: 0.4; cursor: not-allowed; }
+.model-toggle-slider {
+  position: absolute;
+  top: 3px; bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  transition: transform 0.2s ease;
+  z-index: 0;
+}
+.model-toggle[data-active="local"] .model-toggle-slider { transform: translateX(0%); }
+.model-toggle[data-active="cloud"] .model-toggle-slider { transform: translateX(100%); }

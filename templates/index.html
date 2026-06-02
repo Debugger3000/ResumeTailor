@@ -14,6 +14,11 @@
          <div id="app-title">
           <i data-lucide="wand-2" class="lucide-icon" id="brand-icon"></i>
           <h1>Auto Job</h1>
+          <div class="model-toggle" id="modelToggle" data-active="cloud" role="group" aria-label="Active model">
+            <button type="button" class="model-toggle-option" data-kind="local">Local</button>
+            <button type="button" class="model-toggle-option active" data-kind="cloud">Cloud</button>
+            <span class="model-toggle-slider" aria-hidden="true"></span>
+          </div>
           <div class="model-status" id="modelStatus" title="Loading...">
             <span class="model-status-dot"></span>
             <span class="model-status-text">Checking…</span>
@@ -200,7 +205,7 @@
           <label for="modelSelect">Model</label>
           <select id="modelSelect" class="text-input">
             <option value="">-- Select a model --</option>
-            <option value="__custom__">Custom (enter model name manually)…</option>
+            <!-- <option value="__custom__">Custom (enter model name manually)…</option> -->
           </select>
         </div>
 

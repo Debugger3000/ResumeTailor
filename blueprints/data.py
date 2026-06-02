@@ -98,6 +98,7 @@ async def save_model():
     print(body)
 
     provider    = (body.get('provider') or '').strip().lower()
+    provider_category = (body.get('provider_category') or '').strip().lower()
     model_name  = (body.get('model_name') or '').strip()
     host        = (body.get('host') or '').strip() or None
     api_key_env = (body.get('api_key_env') or None)
@@ -114,6 +115,7 @@ async def save_model():
     # save model config to db
     save_model_config(
         provider=provider,
+        provider_category=provider_category,
         model_name=model_name,
         host=host,
         api_key_env=api_key_env,
@@ -124,21 +126,30 @@ async def save_model():
 # route called, after server updates model config, to update ollama_client object and restart ollama with new model config
 @data_bp.route('/model/updated', methods=['POST'])
 async def updated_model_run():
+    body = await request.get_json() or {}
+    kind = (body.get('provider_category') or 'cloud').strip().lower() 
+    want_local = (kind == 'local')
 
-    model = get_model_config()
+    models = get_model_config()   # list of 0–2 rows
 
+    # Find the saved config for the requested side
+    model = next(
+        (m for m in models if is_model_local(m.get('provider')) == want_local),
+        None,
+    )
+
+    # Not in the database → do nothing
     if not model:
-        return {"ok": False, "error": "No model configured"}, 400
+        return {"ok": False, "error": f"No {kind} model configured"}, 400
 
-    # check whether local or cloud
     try:
         if is_model_local(model.get('provider')):
             stop_ollama()
-            time.sleep(0.5)  # let port release
+            time.sleep(0.5)            # let the port release
             ollama_client.configure(model)
             start_ollama(model)
-        # else: cloud — nothing to restart, config is enough
         else:
+            # cloud — just (re)configure the client, nothing to spin up
             gemini_client.configure(model)
             # start_cloud_model(model)
 
@@ -159,7 +170,28 @@ async def get_model():
 # Get current model / model connection status
 @data_bp.route('/model/status', methods=['GET'])
 async def get_model_status():
-    model = get_model_config()
+    models = get_model_config()
+
+    if models == None:
+        return jsonify({
+            "running": False,
+            "provider": None,
+            "configured": False,
+            "model_name": None,
+            "host": None,
+            "loaded_models": [],
+            "error": "No model configured",
+        })
+
+
+    kind = request.args.get('type', 'cloud')
+    want_local = (kind == 'local')
+
+    model = next(
+        (m for m in models if is_model_local(m.get('provider')) == want_local),
+        None,
+    )
+
     # no config exists currently...
     if not model:
         return jsonify({

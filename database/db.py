@@ -29,8 +29,9 @@ def init_db():
             );
 
             CREATE TABLE IF NOT EXISTS model_config (
-                id INTEGER PRIMARY KEY CHECK (id = 1),
+                id INTEGER PRIMARY KEY,
                 provider TEXT NOT NULL DEFAULT 'ollama',
+                provider_category TEXT NOT NULL DEFAULT 'cloud',
                 model_name TEXT NOT NULL DEFAULT 'llama3',
                 api_key_env TEXT,
                 host TEXT,

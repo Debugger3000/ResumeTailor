@@ -699,34 +699,32 @@ loadProfile();
 const MODEL_CATALOG = [
   // ============== OLLAMA (local) ==============
   // host defaults to local daemon, no api key needed
-  { provider: 'ollama', model_name: 'llama3.2',          host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.2 — small, fast, great default' },
-  { provider: 'ollama', model_name: 'llama3.2:1b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.2 1B' },
-  { provider: 'ollama', model_name: 'llama3.2:3b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.2 3B' },
-  { provider: 'ollama', model_name: 'llama3.1',          host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 — workhorse, tool-calling' },
-  { provider: 'ollama', model_name: 'llama3.1:8b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 8B' },
-  { provider: 'ollama', model_name: 'llama3.1:70b',      host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 70B' },
-  { provider: 'ollama', model_name: 'llama3.1:405b',     host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Meta Llama 3.1 405B' },
-  { provider: 'ollama', model_name: 'llama3.3:70b',      host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Llama 3.3 70B — ~405B quality at 70B' },
-  { provider: 'ollama', model_name: 'llama4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Llama 4 — MoE, multimodal' },
-
-  { provider: 'ollama', model_name: 'qwen2.5',           host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 — strong all-rounder, 128K ctx' },
-  { provider: 'ollama', model_name: 'qwen2.5:7b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 7B' },
-  { provider: 'ollama', model_name: 'qwen2.5:14b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 14B' },
-  { provider: 'ollama', model_name: 'qwen2.5:32b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 32B' },
-  { provider: 'ollama', model_name: 'qwen2.5:72b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen2.5 72B' },
-  { provider: 'ollama', model_name: 'qwen3',             host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3 — tools + thinking modes' },
-  { provider: 'ollama', model_name: 'qwen3:8b',          host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3 8B' },
-  { provider: 'ollama', model_name: 'qwen3:32b',         host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3 32B' },
-  { provider: 'ollama', model_name: 'qwen3.6:27b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Qwen3.6 27B — newest Qwen dense' },
-
-  { provider: 'ollama', model_name: 'gemma3',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 — vision, single-GPU friendly' },
-  { provider: 'ollama', model_name: 'gemma3:4b',         host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 4B' },
-  { provider: 'ollama', model_name: 'gemma3:12b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 12B' },
-  { provider: 'ollama', model_name: 'gemma3:27b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 3 27B' },
-  { provider: 'ollama', model_name: 'gemma4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local · General',   desc: 'Gemma 4 — Google, vision + tools' },
+  { provider: 'ollama', model_name: 'llama3.2',          host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.2 — small, fast, great default' },
+  { provider: 'ollama', model_name: 'llama3.2:1b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.2 1B' },
+  { provider: 'ollama', model_name: 'llama3.2:3b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.2 3B' },
+  { provider: 'ollama', model_name: 'llama3.1',          host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.1 — workhorse, tool-calling' },
+  { provider: 'ollama', model_name: 'llama3.1:8b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.1 8B' },
+  { provider: 'ollama', model_name: 'llama3.1:70b',      host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.1 70B' },
+  { provider: 'ollama', model_name: 'llama3.1:405b',     host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Meta Llama 3.1 405B' },
+  { provider: 'ollama', model_name: 'llama3.3:70b',      host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Llama 3.3 70B — ~405B quality at 70B' },
+  { provider: 'ollama', model_name: 'llama4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Llama 4 — MoE, multimodal' },
+  { provider: 'ollama', model_name: 'qwen2.5',           host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen2.5 — strong all-rounder, 128K ctx' },
+  { provider: 'ollama', model_name: 'qwen2.5:7b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen2.5 7B' },
+  { provider: 'ollama', model_name: 'qwen2.5:14b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen2.5 14B' },
+  { provider: 'ollama', model_name: 'qwen2.5:32b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen2.5 32B' },
+  { provider: 'ollama', model_name: 'qwen2.5:72b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen2.5 72B' },
+  { provider: 'ollama', model_name: 'qwen3',             host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen3 — tools + thinking modes' },
+  { provider: 'ollama', model_name: 'qwen3:8b',          host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen3 8B' },
+  { provider: 'ollama', model_name: 'qwen3:32b',         host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen3 32B' },
+  { provider: 'ollama', model_name: 'qwen3.6:27b',       host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Qwen3.6 27B — newest Qwen dense' },
+  { provider: 'ollama', model_name: 'gemma3',            host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Gemma 3 — vision, single-GPU friendly' },
+  { provider: 'ollama', model_name: 'gemma3:4b',         host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Gemma 3 4B' },
+  { provider: 'ollama', model_name: 'gemma3:12b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Gemma 3 12B' },
+  { provider: 'ollama', model_name: 'gemma3:27b',        host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Gemma 3 27B' },
+  { provider: 'ollama', model_name: 'gemma4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Gemma 4 — Google, vision + tools' },
 
   // ============== GOOGLE ==============
-  { provider: 'google',    model_name: 'gemini-2.5-flash',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud · Google', desc: 'Gemini 2.5 Flash — fast' },
+  { provider: 'google',    model_name: 'gemini-2.5-flash',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud', desc: 'Gemini 2.5 Flash — fast' },
 ];
 
 // ============== ANTHROPIC ==============
@@ -741,8 +739,28 @@ const MODEL_CATALOG = [
 
 
 const PROVIDER_NEEDS_KEY = (provider) => provider !== 'ollama';
-let currentModelConfig = null;   // module-level cache of the saved row
+// let currentModelConfig = null;   // module-level cache of the saved row
 let isDirty = false;
+let currentModelTypeSelected = 'cloud'; // Either a cloud or local model is selected...
+
+let modelConfigs = [];   // cached saved configs — up to two rows: one local, one cloud
+
+function maskKey(key) {
+  // Swap every char for 'x' so the real key never lingers in client memory.
+  return key ? 'x'.repeat(key.length) : null;
+}
+
+function configKind(cfg) {
+  // 'local' for Ollama / locally-hosted, 'cloud' otherwise.
+  if (cfg.provider_category) {
+    return cfg.provider_category.toLowerCase().startsWith('local') ? 'local' : 'cloud';
+  }
+  return (cfg.host || '').includes('localhost') ? 'local' : 'cloud';
+}
+
+function getConfigByKind(kind) {
+  return modelConfigs.find(c => configKind(c) === kind) || null;
+}
 
 
 function markDirty() {
@@ -831,10 +849,12 @@ async function saveModelConfig() {
   const host = hostInput?.value.trim() || entry.host;
   const modelApiKey = document.getElementById('apiKeyInput');
   const apiKey = modelApiKey?.value.trim();
+  const providerCategory = entry.category.toLowerCase();
 
 
   const payload = {
     provider:    entry.provider,
+    provider_category: providerCategory,
     model_name:  entry.model_name,
     host:        host,
     api_key_env: apiKey,   // env var NAME, not the key itself
@@ -867,6 +887,25 @@ async function saveModelConfig() {
     status.className = 'status success';
     markPristine();
 
+    const kind = getActiveTab();
+
+    // Keep the local cache in sync so the toggle knows this side now exists
+    const savedCfg = {
+      provider:          entry.provider,
+      provider_category: providerCategory,
+      model_name:        entry.model_name,
+      host:              host,
+      api_key_env:       maskKey(apiKey),
+    };
+    const idx = modelConfigs.findIndex(c => configKind(c) === kind);
+    if (idx >= 0) modelConfigs[idx] = savedCfg;   // replace existing side
+    else          modelConfigs.push(savedCfg);    // add the new side
+
+    currentModelTypeSelected = kind;
+
+    syncModelToggle();
+
+
     // send another request to restart model connection / server
     await restart_model_server();
 
@@ -894,6 +933,7 @@ async function restart_model_server() {
     const res = await fetch('/api/data/model/updated', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider_category: currentModelTypeSelected })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
@@ -915,7 +955,7 @@ async function restart_model_server() {
   }
 }
 
-function populateModelSelect(tab = 'local') {
+function populateModelSelect(tab = 'cloud') {
   const select = document.getElementById('modelSelect');
 
   // Filter catalog by the active tab
@@ -958,20 +998,37 @@ function initModelTabs() {
         p.classList.toggle('hidden', p.id !== `modelTab-${target}`);
       });
 
-      // Refresh dropdown for the active tab
-      populateModelSelect(target);
-
-      // Show/hide API key row based on tab
       const apiKeyRow = document.getElementById('apiKeyRow');
       if (apiKeyRow) apiKeyRow.classList.toggle('hidden', target === 'local');
 
-      // Reset description + custom
-      document.getElementById('modelDescription').textContent = '';
-      document.getElementById('customModelRow').classList.add('hidden');
-      markDirty();
+      hydrateTab(target);   // restore saved config for this tab from the cache
     });
   });
 }
+
+// function initModelTabs() {
+//   document.querySelectorAll('.model-tab').forEach(btn => {
+//     btn.addEventListener('click', () => {
+//       const target = btn.dataset.tab;
+//       document.querySelectorAll('.model-tab').forEach(b => b.classList.toggle('active', b === btn));
+//       document.querySelectorAll('.model-tab-panel').forEach(p => {
+//         p.classList.toggle('hidden', p.id !== `modelTab-${target}`);
+//       });
+
+//       // Refresh dropdown for the active tab
+//       populateModelSelect(target);
+
+//       // Show/hide API key row based on tab
+//       const apiKeyRow = document.getElementById('apiKeyRow');
+//       if (apiKeyRow) apiKeyRow.classList.toggle('hidden', target === 'local');
+
+//       // Reset description + custom
+//       document.getElementById('modelDescription').textContent = '';
+//       document.getElementById('customModelRow').classList.add('hidden');
+//       markDirty();
+//     });
+//   });
+// }
 
 function initModelConfig() {
   populateModelSelect('local');
@@ -1006,33 +1063,118 @@ function initModelConfig() {
 }
 
 
+// async function loadModelConfig() {
+//   try {
+//     const res  = await fetch('/api/data/model', { method: 'GET' });
+//     const data = await res.json().catch(() => ({}));
+
+//     console.log(`Saved Model details: ${data}`);
+//     console.log(`Saved Model details: ${data.provider}`);
+//     if (!res.ok) {
+//       console.warn('Failed to load model config:', data.error || res.status);
+//       return null;
+//     }
+
+//        // null if nothing saved yet
+//     hydrateModelConfig(data);
+//     return data;
+//   } catch (err) {
+//     console.error('loadModelConfig error:', err);
+//     return null;
+//   }
+// }
+
 async function loadModelConfig() {
   try {
     const res  = await fetch('/api/data/model', { method: 'GET' });
-    const data = await res.json().catch(() => ({}));
+    const data = await res.json().catch(() => ([]));
 
-    console.log(`Saved Model details: ${data}`);
-    console.log(`Saved Model details: ${data.provider}`);
     if (!res.ok) {
       console.warn('Failed to load model config:', data.error || res.status);
       return null;
     }
 
-       // null if nothing saved yet
-    hydrateModelConfig(data);
-    return data;
+    // Endpoint now returns an array of rows (0–2). Tolerate a {configs:[...]} wrapper too.
+    const rows = Array.isArray(data) ? data : (data.configs || []);
+
+    
+
+    // Cache them, masking the API key so plaintext never sits in client memory.
+    modelConfigs = rows.map(cfg => ({
+      ...cfg,
+      api_key_env: maskKey(cfg.api_key_env),
+    }));
+
+    console.log(`Returned models config'd: ${modelConfigs}`);
+
+    hydrateModelConfig();
+    return modelConfigs;
   } catch (err) {
     console.error('loadModelConfig error:', err);
     return null;
   }
 }
 
+function hydrateTab(tab) {
+  const cfg = getConfigByKind(tab);
 
-function hydrateModelConfig(cfg) {
-  const isLocal = cfg.provider === 'ollama';
-  const targetTab = isLocal ? 'local' : 'cloud';
+  // For cloud, set provider dropdown first so the right models filter in.
+  if (tab === 'cloud' && cfg) {
+    const providerSelect = document.getElementById('cloudProviderSelect');
+    if (providerSelect) providerSelect.value = cfg.provider;
+  }
+  populateModelSelect(tab);
 
-  // 1. Activate the right tab
+  const select      = document.getElementById('modelSelect');
+  const description = document.getElementById('modelDescription');
+  const customRow   = document.getElementById('customModelRow');
+  const customInput = document.getElementById('customModelInput');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const hostInput   = document.getElementById('ollamaHost');
+
+  // Nothing saved for this tab → reset to placeholder.
+  if (!cfg) {
+    select.value = '';
+    description.textContent = '';
+    customRow.classList.add('hidden');
+    if (apiKeyInput) { apiKeyInput.value = ''; apiKeyInput.placeholder = 'Enter API key'; }
+    markPristine();
+    return;
+  }
+
+  // Select the saved model, or fall back to the custom input.
+  const optionExists = [...select.options].some(o => o.value === cfg.model_name);
+  if (optionExists) {
+    select.value = cfg.model_name;
+    description.textContent = select.selectedOptions[0]?.dataset.desc || '';
+    customRow.classList.add('hidden');
+  } else {
+    select.value = '__custom__';
+    customRow.classList.remove('hidden');
+    customInput.value = cfg.model_name;
+    description.textContent = '';
+  }
+
+  // Host (local only).
+  if (tab === 'local' && cfg.host && hostInput) {
+    hostInput.value = cfg.host;
+  }
+
+  // API key — already masked; surface as a placeholder hint only.
+  if (tab === 'cloud' && apiKeyInput) {
+    apiKeyInput.value = '';
+    apiKeyInput.placeholder = cfg.api_key_env ? `Saved: ${cfg.api_key_env}` : 'Enter API key';
+  }
+
+  markPristine();
+}
+
+
+function hydrateModelConfig() {
+  const targetTab = 'cloud';            // load the cloud side on startup
+  currentModelTypeSelected = targetTab;
+
+  // Activate the cloud tab
   document.querySelectorAll('.model-tab').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === targetTab);
   });
@@ -1040,50 +1182,55 @@ function hydrateModelConfig(cfg) {
     p.classList.toggle('hidden', p.id !== `modelTab-${targetTab}`);
   });
 
-  // 2. For cloud: set the provider dropdown FIRST so populateModelSelect
-  //    can filter to that provider's models
-  if (!isLocal) {
-    const providerSelect = document.getElementById('cloudProviderSelect');
-    if (providerSelect) providerSelect.value = cfg.provider;
-  }
+  const apiKeyRow = document.getElementById('apiKeyRow');
+  if (apiKeyRow) apiKeyRow.classList.toggle('hidden', targetTab === 'local');
 
-  // 3. Populate the model dropdown for the active tab
-  populateModelSelect(targetTab);
-
-  // 4. Try to select the saved model in the dropdown
-  const select = document.getElementById('modelSelect');
-  const optionExists = [...select.options].some(o => o.value === cfg.model_name);
-
-  if (optionExists) {
-    select.value = cfg.model_name;
-    const opt = select.selectedOptions[0];
-    document.getElementById('modelDescription').textContent = opt?.dataset.desc || '';
-    document.getElementById('customModelRow').classList.add('hidden');
-  } else {
-    // Saved model isn't in catalog — fall back to custom input
-    select.value = '__custom__';
-    document.getElementById('customModelRow').classList.remove('hidden');
-    document.getElementById('customModelInput').value = cfg.model_name;
-    document.getElementById('modelDescription').textContent = '';
-  }
-
-  // 5. Restore host (local only)
-  if (isLocal && cfg.host) {
-    const hostInput = document.getElementById('ollamaHost');
-    if (hostInput) hostInput.value = cfg.host;
-  }
-
-  // Note: api_key is NOT hydrated — it's never sent back from the server,
-  // so the API key field stays empty. User only re-enters it if changing.
-
-  markPristine(); 
+  hydrateTab(targetTab);   // fills the fields from the cached cloud config
+  syncModelToggle();
 }
 
 // load model config data / form setup on load
 document.addEventListener('DOMContentLoaded', async () => {
   initModelConfig();
   await loadModelConfig();   // hydrate from saved row
+  initModelToggle();
 });
+
+
+// Toggle Cloud or Local 
+// ---------------
+function initModelToggle() {
+  const toggle = document.getElementById('modelToggle');
+  if (!toggle) return;
+
+  toggle.querySelectorAll('.model-toggle-option').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const kind = btn.dataset.kind;                 // 'cloud' | 'local'
+      if (kind === currentModelTypeSelected) return; // already active
+      if (!getConfigByKind(kind)) return;            // nothing saved for that side
+
+      currentModelTypeSelected = kind;
+      syncModelToggle();              // instant visual feedback
+      await restart_model_server();   // bring the now-active config online
+    });
+  });
+
+  syncModelToggle();
+}
+
+// Reflect currentModelTypeSelected + which configs exist into the toggle
+function syncModelToggle() {
+  const toggle = document.getElementById('modelToggle');
+  if (!toggle) return;
+
+  toggle.dataset.active = currentModelTypeSelected;   // drives the slider
+
+  toggle.querySelectorAll('.model-toggle-option').forEach(btn => {
+    const kind = btn.dataset.kind;
+    btn.classList.toggle('active', kind === currentModelTypeSelected);
+    btn.disabled = !getConfigByKind(kind);            // grey out unsaved sides
+  });
+}
 
 
 
@@ -1333,7 +1480,7 @@ let modelStatusPollTimer = null;
 
 async function fetchModelStatus() {
   try {
-    const res = await fetch('/api/data/model/status', { method: 'GET' });
+    const res = await fetch(`/api/data/model/status?type=${currentModelTypeSelected}`, { method: 'GET' });
     const data = await res.json().catch(() => ({}));
     // request threw error
     if (!res.ok) {
@@ -1361,9 +1508,7 @@ function renderModelStatus(status) {
     el.classList.add('restarting');
     const provider  = status.provider  || '';
     const modelName = status.model_name || '';
-    textEl.textContent = provider && modelName
-      ? `Restarting ${provider} — ${modelName}…`
-      : 'Restarting…';
+    textEl.textContent = 'Restarting Model…';
     el.title = 'Model connection is restarting';
     return;
   }
