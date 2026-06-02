@@ -1382,7 +1382,7 @@ function renderModelStatus(status) {
   } else {
     el.classList.add('stopped');
     const reason = status.error ? ` (${status.error})` : '';
-    textEl.textContent = `Disconnected${reason}`;
+    textEl.textContent = `Disconnected`;
     el.title = status.error || 'Model is not running';
   }
 }
