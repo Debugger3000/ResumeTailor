@@ -37,8 +37,7 @@ async def fill_fields(page_or_frame, fields: list[dict]) -> dict:
         "errors": [{"agent_id": str, "question": str, "error": str}, ...]
       }
     """
-    print("fields before fill_fields processes.......")
-    print(fields)
+    
     results = {"filled": 0, "skipped": 0, "errors": []}
     
     print(f"=== fill_fields: processing {len(fields)} fields ===")
@@ -121,13 +120,19 @@ async def fill_one(page_or_frame, field: dict) -> None:
         await locator.scroll_into_view_if_needed(timeout=5000)
         await locator.fill(str(value))
     elif kind == "select":
+        locator = page_or_frame.locator(f'[data-agent-id="{agent_id}"]')
+        await locator.scroll_into_view_if_needed(timeout=5000)
         await locator.select_option(value=str(value))
     elif kind == "checkbox":
+        locator = page_or_frame.locator(f'[data-agent-id="{agent_id}"]')
+        await locator.scroll_into_view_if_needed(timeout=5000)
         if value:
             await locator.check()
         else:
             await locator.uncheck()
     elif kind == 'combobox':
+        locator = page_or_frame.locator(f'[data-agent-id="{agent_id}"]')
+        await locator.scroll_into_view_if_needed(timeout=5000)
         await fill_react_select(page_or_frame, agent_id, value)
     else:
         raise ValueError(f"unknown field kind: {kind!r}")

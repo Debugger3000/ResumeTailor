@@ -21,8 +21,7 @@ async def populate_field_values(fields: list[dict]) -> tuple[list[dict], float]:
 
     try:
         parsed, elapsed = await run_model(APPLY_PROMPT, user_prompt, POPULATE_FIELDS_SCHEMA)
-        print("Parsed right after:------------------------")
-        print(parsed)
+        
     except json.JSONDecodeError as e:
         print(f"=== run_model call: POPULATE FIELDS JSON DECODE ERROR: {e} ===")
         return fields, 0.0          

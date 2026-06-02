@@ -140,7 +140,7 @@ async def updated_model_run():
         # else: cloud — nothing to restart, config is enough
         else:
             gemini_client.configure(model)
-            start_cloud_model(model)
+            # start_cloud_model(model)
 
         return {"ok": True}
     except Exception as e:
