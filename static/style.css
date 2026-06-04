@@ -171,6 +171,10 @@ textarea:focus, input:focus { border-color: #6366f1; }
 }
 .secondary-btn:hover { border-color: #6366f1; color: #a5b4fc; }
 
+#startAgentBtn{
+  margin-top: 12px;
+}
+
 .action-row {
   display: flex;
   gap: 0.75rem;

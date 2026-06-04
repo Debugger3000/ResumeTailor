@@ -8,11 +8,13 @@ from database.queries.user_profile import get_user_profile, update_user_profile
 from database.queries.ai_models import save_model_config, get_model_config
 from services.apply.apply_agent import get_full_user_data
 from database.queries.experience import get_user_experience, create_user_experience, patch_user_experience, delete_user_experience
+from database.queries.education import get_user_education, create_user_education, patch_user_education, delete_user_education
 from services.ai_model_control.helpers import ollama_status, is_model_local
 from services.ai_model_control.run_local_model import stop_ollama, start_ollama
 from services.ai_model_control.run_cloud_model import start_cloud_model
 from services.ai_model_control.ollama_client import ollama_client
 from services.ai_model_control.gemini_client import gemini_client
+
 
 # blueprint - route name is 'tailor'
 data_bp = Blueprint('data', __name__)
@@ -87,6 +89,35 @@ async def delete_experience(exp_id):
     if not deleted:
         return jsonify({"ok": False, "error": "Not found"}), 404
     return jsonify({"ok": True, "id": exp_id})
+
+
+@data_bp.route('/education', methods=['GET'])
+async def get_education():
+    return jsonify(get_user_education())
+
+
+@data_bp.route('/education', methods=['POST'])
+async def create_education():
+    body = await request.get_json() or {}
+    new_id = create_user_education(body)
+    return jsonify({"ok": True, "id": new_id}), 201
+
+
+@data_bp.route('/education/<int:edu_id>', methods=['PATCH'])
+async def patch_education(edu_id):
+    body = await request.get_json() or {}
+    updated = patch_user_education(edu_id, body)
+    if not updated:
+        return jsonify({"ok": False, "error": "Not found"}), 404
+    return jsonify({"ok": True, "id": edu_id})
+
+
+@data_bp.route('/education/<int:edu_id>', methods=['DELETE'])
+async def delete_education(edu_id):
+    deleted = delete_user_education(edu_id)
+    if not deleted:
+        return jsonify({"ok": False, "error": "Not found"}), 404
+    return jsonify({"ok": True, "id": edu_id})
 
 
 

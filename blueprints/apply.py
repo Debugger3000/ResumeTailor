@@ -5,6 +5,7 @@ from services.apply.apply_helpers import extract_form_fields, fill_fields, get_f
 from services.apply.apply_agent import populate_field_values
 from services.browser.browser_helpers import resolve_active_page, wait_for_page_ready, find_form_target
 from services.apply.apply_fields_filter import filter_fields
+from services.apply.site_detect import detect_site
 
 apply_bp = Blueprint('apply', __name__)
 
@@ -66,9 +67,16 @@ async def apply_begin():
     target = await find_form_target(page)
     print(f"form target: {target.url if hasattr(target, 'url') else 'main frame'}")
 
+    # detect specific job sites
+    site = await detect_site(target)
+    print(f"detected site: {site.value}")
+
+    fields = await extract_form_fields(target, site=site)
+
+
 
     #html = await get_page_html(session)
-    fields = await extract_form_fields(target)
+    # fields = await extract_form_fields(target)
 
     filtered_fields = filter_fields(fields)
     print(f"fields returned:\n {fields}")
@@ -93,45 +101,20 @@ async def apply_begin():
     })
 
 
-# @apply_bp.route('/continue', methods=['POST'])
-# async def apply_continue():
-#     data = await request.get_json()
-#     session = manager.get(data['session_id'])
-#     if not session:
-#         return jsonify({'error': 'unknown session'}), 404
+@apply_bp.route('/scan', methods=['POST'])
+async def apply_scan():
+    """Re-read the CURRENT page's fields on demand. Reads the live DOM each
+    call, so call it AFTER you've revealed/added the fields you want."""
+    session = manager.current
+    if not session:
+        return jsonify({'error': 'no active session — call /start first'}), 400
 
-#     # session.page is a live Page — agent can interact with it
-#     # e.g. await session.page.click(...), await session.page.fill(...)
-#     # await agent.step(session)
+    page = await resolve_active_page(session)
+    session.last_known_page = page
 
-#     return jsonify({'status': 'ok'})
+    await wait_for_page_ready(page)
+    target = await find_form_target(page)      # re-find every scan, no caching
+    fields = await extract_form_fields(target)
+    filtered = filter_fields(fields)
 
-
-# @apply_bp.route('/stop', methods=['POST'])
-# async def apply_stop():
-#     data = await request.get_json()
-#     await manager.close_session(data['session_id'])
-#     return jsonify({'status': 'stopped'})
-
-
-
-# @apply_bp.route('/advance', methods=['POST'])
-# async def apply_advance():
-#     """Click Continue/Submit on the current page and report what happened."""
-#     session = manager.current
-#     if not session:
-#         return jsonify({'error': 'no active session'}), 400
-    
-#     page = await resolve_active_page(session)
-#     advanced = await click_continue(page)
-    
-#     if advanced:
-#         # Re-resolve in case the click opened a new tab
-#         page = await resolve_active_page(session)
-#         await wait_for_page_ready(page)
-#         session.last_known_page = page
-    
-#     return jsonify({
-#         'advanced': advanced,
-#         'url': page.url,
-#     })
+    return jsonify({'url': page.url, 'count': len(filtered), 'fields': filtered})

@@ -1,11 +1,4 @@
 
-# WHAT COUNTS AS A TECHNOLOGY/SKILL:
-# - Programming languages: Python, JavaScript, TypeScript, Java, Go, Rust, C++, etc.
-# - Frameworks/libraries: React, Vue, Django, FastAPI, Express, Spring, etc.
-# - Databases: PostgreSQL, MySQL, MongoDB, Redis, etc.
-# - Tools/platforms: Docker, Kubernetes, AWS, Azure, Git, Jenkins, etc.
-# - Concepts that map to skills: REST, GraphQL, CI/CD, Agile, etc.
-
 # -----
 # Prompt for paragraph / docx line extraction
 # Change this if you want to change what lines are to be grabbed and changed by the second stage tailoring model call
@@ -36,12 +29,6 @@ WHAT DOES NOT COUNT:
 - Generic words like "team", "project", "code"
 
 """
-
-# EXAMPLE OUTPUT:
-# {"applicable_paragraphs": [
-#   {"index": 2, "original_text": "Full Stack Developer(3+ years xp) - Typescript, C#, Python and Linux environments."}, 
-#   {"index": 6, "original_text": "Full Stack Developer - Internship"}, 
-# ]}
 
 
 

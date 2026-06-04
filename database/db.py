@@ -66,6 +66,7 @@ def init_db():
                 work_auth_status TEXT,
                 requires_sponsorship_now INTEGER,
                 requires_sponsorship_future INTEGER,
+                criminal_history TEXT,
                 -- preferences
                 desired_salary TEXT,
                 desired_salary_currency TEXT,
@@ -73,10 +74,14 @@ def init_db():
                 open_to_travel INTEGER,
                 -- demographics
                 gender TEXT,
+                hispanic_latino TEXT,
                 race_ethnicity TEXT,
+                visible_minority TEXT,
+                indigenous_status TEXT,
                 veteran_status TEXT,
                 disability_status TEXT,
-                lgbtq TEXT,
+                sexual_orientation TEXT,
+                transgender TEXT,
                 -- compliance
                 is_18_or_older INTEGER,
                 can_provide_work_documents INTEGER,
@@ -85,6 +90,14 @@ def init_db():
                 current_country TEXT,
                 eligible_for_work_current_country INTEGER,
                 allow_data_use INTEGER,
+                --Language
+                language    TEXT NOT NULL,
+                is_native   INTEGER,
+                overall     TEXT,
+                reading     TEXT,
+                speaking    TEXT,
+                writing     TEXT,              
+                
                 -- open questions
                 why_this_company TEXT,
                 why_this_role TEXT,
@@ -103,6 +116,19 @@ def init_db():
                 is_current INTEGER DEFAULT 0,
                 summary TEXT,
                 tech_stack TEXT,  -- JSON array stored as text
+                sort_order INTEGER DEFAULT 0
+            );
+                           
+            CREATE TABLE IF NOT EXISTS education (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                school TEXT,
+                program TEXT,
+                degree_type TEXT,
+                gpa TEXT,
+                start_date TEXT,
+                end_date TEXT,
+                currently_enrolled INTEGER,
+                summary TEXT,
                 sort_order INTEGER DEFAULT 0
             );
 

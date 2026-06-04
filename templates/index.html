@@ -113,6 +113,7 @@
       <div class="card">
         <label for="appUrl">Application URL</label>
         <input type="url" id="appUrl" placeholder="https://jobs.company.com/apply/..." />
+        <button id="startAgentBtn" class="primary-btn">Launch Browser</button>
       </div>
 
       <!-- <div class="card">
@@ -123,7 +124,7 @@
         </div>
       </div> -->
 
-      <button id="startAgentBtn" class="primary-btn">Launch Browser</button>
+      
 
       <section class="card agent-log hidden" id="agentLog">
         <h2>Agent Activity</h2>
@@ -132,6 +133,7 @@
 
         <!-- Begin applying with agent on first page -->
         <button id="beginBtn" class="primary-btn hidden">Fill Form</button>
+        <button id="scanPageBtn" class="primary-btn hidden">Scan Page</button>
 
         <div class="confirm-box hidden" id="confirmBox">
           <p id="confirmText">Agent is waiting for your review.</p>
@@ -344,6 +346,87 @@
           <div class="experience-card-stack"></div>
         </div>
       </template>
+
+      <div class="card">
+        <div class="profile-header">
+          <label>Education</label>
+          <button id="educationAddBtn" class="secondary-btn profile-edit-btn">+ Add</button>
+        </div>
+
+        <div class="config-section" id="educationSection">
+          <div id="educationList" class="experience-list">
+            <!-- Entries injected by JS -->
+          </div>
+          <p class="file-status" id="educationStatus">No education added yet.</p>
+        </div>
+      </div>
+
+      <!-- Education editor -->
+      <template id="educationEditorTemplate">
+        <div class="experience-editor education-editor">
+          <div class="profile-grid">
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">School or University</span>
+              <input type="text" class="profile-field-input" data-field="school" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">Degree</span>
+              <input type="text" class="profile-field-input" data-field="degree_type" placeholder="Diploma, Bachelor's..." />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">Program / Field of Study</span>
+              <input type="text" class="profile-field-input" data-field="program" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">GPA</span>
+              <input type="text" class="profile-field-input" data-field="gpa" placeholder="3.8 / 4.0" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">Start Year</span>
+              <input type="number" class="profile-field-input" data-field="start_date" placeholder="YYYY" min="1950" max="2100" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-field-label">End Year (Actual or Expected)</span>
+              <input type="number" class="profile-field-input" data-field="end_date" placeholder="YYYY" min="1950" max="2100" />
+            </div>
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">Currently Enrolled</span>
+              <select class="profile-field-input" data-field="currently_enrolled">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <div class="profile-field profile-field-wide">
+              <span class="profile-field-label">Summary</span>
+              <textarea class="profile-field-input" data-field="summary" rows="4"
+                        placeholder="Honors, activities, relevant coursework..."></textarea>
+            </div>
+          </div>
+
+          <div class="experience-editor-actions">
+            <button class="primary-btn education-save-btn">Save</button>
+            <button class="secondary-btn education-cancel-btn">Cancel</button>
+            <button class="secondary-btn education-delete-btn hidden">Delete</button>
+          </div>
+        </div>
+      </template>
+
+      <!-- Display card -->
+      <template id="educationCardTemplate">
+        <div class="experience-card education-card">
+          <div class="experience-card-header">
+            <div>
+              <div class="experience-card-title education-card-title"></div>
+              <div class="experience-card-company education-card-subtitle"></div>
+            </div>
+            <div class="experience-card-actions">
+              <button class="secondary-btn profile-edit-btn education-edit-btn">Edit</button>
+            </div>
+          </div>
+          <div class="experience-card-meta education-card-meta"></div>
+          <div class="experience-card-summary education-card-summary"></div>
+        </div>
+      </template>
     
       <!-- User profile -->
       <!-- User profile -->
@@ -537,9 +620,24 @@
                 <input type="text" class="profile-field-input" data-field="gender" />
               </div>
               <div class="profile-field">
+                <span class="profile-field-label">Hispanic / Latino</span>
+                <span class="profile-field-value" data-field="hispanic_latino">—</span>
+                <input type="text" class="profile-field-input" data-field="hispanic_latino" placeholder="Yes / No / Decline" />
+              </div>
+              <div class="profile-field">
                 <span class="profile-field-label">Race / Ethnicity</span>
                 <span class="profile-field-value" data-field="race_ethnicity">—</span>
                 <input type="text" class="profile-field-input" data-field="race_ethnicity" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Visible Minority</span>
+                <span class="profile-field-value" data-field="visible_minority">—</span>
+                <input type="text" class="profile-field-input" data-field="visible_minority" placeholder="Canada: Yes / No / category" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Indigenous Status</span>
+                <span class="profile-field-value" data-field="indigenous_status">—</span>
+                <input type="text" class="profile-field-input" data-field="indigenous_status" placeholder="First Nations / Métis / Inuit / Not / Decline" />
               </div>
               <div class="profile-field">
                 <span class="profile-field-label">Veteran Status</span>
@@ -552,9 +650,14 @@
                 <input type="text" class="profile-field-input" data-field="disability_status" />
               </div>
               <div class="profile-field">
-                <span class="profile-field-label">LGBTQ</span>
-                <span class="profile-field-value" data-field="lgbtq">—</span>
-                <input type="text" class="profile-field-input" data-field="lgbtq" />
+                <span class="profile-field-label">Sexual Orientation</span>
+                <span class="profile-field-value" data-field="sexual_orientation">—</span>
+                <input type="text" class="profile-field-input" data-field="sexual_orientation" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Transgender</span>
+                <span class="profile-field-value" data-field="transgender">—</span>
+                <input type="text" class="profile-field-input" data-field="transgender" placeholder="Yes / No / Decline" />
               </div>
             </div>
           </div>
@@ -615,6 +718,46 @@
                   <option value="1">Yes</option>
                   <option value="0">No</option>
                 </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Language -->
+          <div class="profile-group">
+            <h4 class="profile-group-title">Language</h4>
+            <div class="profile-grid">
+              <div class="profile-field">
+                <span class="profile-field-label">Language</span>
+                <span class="profile-field-value" data-field="language">—</span>
+                <input type="text" class="profile-field-input" data-field="language" placeholder="English, French..." />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Fluent / Native</span>
+                <span class="profile-field-value" data-field="is_native" data-bool="true">—</span>
+                <select class="profile-field-input" data-field="is_native">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Overall</span>
+                <span class="profile-field-value" data-field="overall">—</span>
+                <input type="text" class="profile-field-input" data-field="overall" placeholder="Basic / Intermediate / Advanced / Native" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Reading</span>
+                <span class="profile-field-value" data-field="reading">—</span>
+                <input type="text" class="profile-field-input" data-field="reading" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Speaking</span>
+                <span class="profile-field-value" data-field="speaking">—</span>
+                <input type="text" class="profile-field-input" data-field="speaking" />
+              </div>
+              <div class="profile-field">
+                <span class="profile-field-label">Writing</span>
+                <span class="profile-field-value" data-field="writing">—</span>
+                <input type="text" class="profile-field-input" data-field="writing" />
               </div>
             </div>
           </div>

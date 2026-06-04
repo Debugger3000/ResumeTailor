@@ -136,6 +136,7 @@ async function renderDocxPreview(url) {
 // ========== APPLY PAGE ==========
 const appUrl = document.getElementById('appUrl');
 const startAgentBtn = document.getElementById('startAgentBtn');
+const scanPageBtn = document.getElementById('scanPageBtn');
 const beginBtn = document.getElementById('beginBtn');
 const resumeDot = document.getElementById('resumeDot');
 // const resumeReadyText = document.getElementById('resumeReadyText');
@@ -178,7 +179,7 @@ startAgentBtn.addEventListener('click', async () => {
   agentLog.classList.remove('hidden');
   logEntries.innerHTML = '';
   addLog('Launching browswer...', 'action');
-  startAgentBtn.disabled = true;
+  // startAgentBtn.disabled = true;
   applyStatus.className = 'status';
   applyStatus.textContent = 'Browser activating...';
 
@@ -201,14 +202,40 @@ startAgentBtn.addEventListener('click', async () => {
     addLog(data.message || 'Awaiting first step...', 'action');
 
     beginBtn.classList.remove('hidden');
+    scanPageBtn.classList.remove('hidden');
     applyStatus.textContent = 'Browser running...';
-    startAgentBtn.classList.add('hidden'); // make sure start browser button is hidden after...
+    //startAgentBtn.classList.add('hidden'); // make sure start browser button is hidden after...
     
   } catch (err) {
     addLog('Error: ' + err.message, 'warning');
     applyStatus.textContent = 'Agent failed to start.';
     applyStatus.className = 'status error';
   }
+});
+
+
+scanPageBtn.addEventListener('click', async () => {
+  try {
+    const res = await fetch('/api/apply/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await res.json();
+
+    // // track browser id
+    // state.browserSessionId = data.session_id;
+
+    // addLog('Browser launched and navigated to URL', 'success');
+    // addLog(data.message || 'Awaiting first step...', 'action');
+
+    // beginBtn.classList.remove('hidden');
+    // applyStatus.textContent = 'Browser running...';
+    //startAgentBtn.classList.add('hidden'); // make sure start browser button is hidden after...
+    
+  } catch (err) {
+    addLog('Scan Page Error: ' + err.message, 'warning');
+  }
+
 });
 
 
@@ -1472,6 +1499,203 @@ experienceAddBtn.addEventListener('click', () => {
 
 // ---------- Init ----------
 loadExperience();
+
+
+//  ---------------------------------
+//  Education
+// ----------------------------------
+
+const educationList   = document.getElementById('educationList');
+const educationAddBtn = document.getElementById('educationAddBtn');
+const educationStatus = document.getElementById('educationStatus');
+
+let educationEntries = [];
+
+const BOOL_EDU_FIELDS = new Set(['currently_enrolled']);
+
+// ---------- Fetch ----------
+async function loadEducation() {
+  try {
+    const res = await fetch('/api/data/education');
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    const data = await res.json();
+    educationEntries = Array.isArray(data) ? data : (data.education || []);
+    renderEducationList();
+  } catch (err) {
+    console.log('Failed to load education:', err);
+    educationStatus.textContent = 'Failed to load education.';
+  }
+}
+
+// ---------- Render ----------
+function renderEducationList() {
+  educationList.innerHTML = '';
+
+  if (!educationEntries.length) {
+    educationStatus.textContent = 'No education added yet.';
+    return;
+  }
+  educationStatus.textContent = `${educationEntries.length} entr${educationEntries.length === 1 ? 'y' : 'ies'}.`;
+
+  const sorted = [...educationEntries].sort((a, b) => {
+    if ((a.sort_order || 0) !== (b.sort_order || 0)) {
+      return (a.sort_order || 0) - (b.sort_order || 0);
+    }
+    if (a.currently_enrolled !== b.currently_enrolled) return b.currently_enrolled - a.currently_enrolled;
+    return (b.start_date || '').localeCompare(a.start_date || '');
+  });
+
+  for (const entry of sorted) {
+    educationList.appendChild(renderEducationCard(entry));
+  }
+}
+
+function renderEducationCard(entry) {
+  const tpl = document.getElementById('educationCardTemplate').content.cloneNode(true);
+  const card = tpl.querySelector('.education-card');
+
+  card.querySelector('.education-card-title').textContent = entry.school || '(Unnamed school)';
+
+  const subtitle = [entry.degree_type, entry.program].filter(Boolean).join(', ');
+  card.querySelector('.education-card-subtitle').textContent = subtitle;
+
+  const dateRange = formatEduDateRange(entry.start_date, entry.end_date, entry.currently_enrolled);
+  const gpa = entry.gpa ? `GPA ${entry.gpa}` : '';
+  card.querySelector('.education-card-meta').textContent = [dateRange, gpa].filter(Boolean).join('  •  ');
+
+  card.querySelector('.education-card-summary').textContent = entry.summary || '';
+
+  card.querySelector('.education-edit-btn').addEventListener('click', () => {
+    const editor = buildEducationEditor(entry, card);
+    card.replaceWith(editor);
+  });
+
+  return card;
+}
+
+function formatEduDateRange(start, end, isEnrolled) {
+  const yr = (s) => (s ? String(s).split('-')[0] : '');   // tolerate "YYYY" or "YYYY-MM"
+  const startStr = yr(start);
+  let endStr;
+  if (Number(isEnrolled) === 1) {
+    endStr = end ? `Expected ${yr(end)}` : 'Present';
+  } else {
+    endStr = yr(end);
+  }
+  if (!startStr && !endStr) return '';
+  return `${startStr || '?'} → ${endStr || '?'}`;
+}
+
+// ---------- Editor ----------
+function buildEducationEditor(entry, replaceCard /* nullable */) {
+  const tpl    = document.getElementById('educationEditorTemplate').content.cloneNode(true);
+  const editor = tpl.querySelector('.education-editor');
+  const isNew  = !entry || !entry.id;
+
+  editor.querySelectorAll('.profile-field-input').forEach(el => {
+    const key = el.dataset.field;
+    let val = entry?.[key];
+    if (BOOL_EDU_FIELDS.has(key)) {
+      el.value = String(Number(val) || 0);
+    } else {
+      el.value = val ?? '';
+    }
+  });
+
+  const saveBtn   = editor.querySelector('.education-save-btn');
+  const cancelBtn = editor.querySelector('.education-cancel-btn');
+  const deleteBtn = editor.querySelector('.education-delete-btn');
+
+  if (!isNew) deleteBtn.classList.remove('hidden');
+
+  saveBtn.addEventListener('click', async () => {
+    const payload = collectEducationForm(editor);
+    if (!isNew) payload.id = entry.id;
+
+    const original = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="spinner"></span><span>Saving...</span>';
+
+    try {
+      const method = isNew ? 'POST' : 'PATCH';
+      const url    = isNew ? '/api/data/education' : `/api/data/education/${entry.id}`;
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Server error (${res.status})`);
+      const saved = await res.json().catch(() => ({}));
+
+      if (isNew) {
+        educationEntries.push({ ...payload, id: saved.id ?? Date.now() });
+      } else {
+        educationEntries = educationEntries.map(e => e.id === entry.id ? { ...e, ...payload } : e);
+      }
+
+      renderEducationList();
+      configStatus.textContent = 'Education saved.';
+    } catch (err) {
+      console.log('Education save failed:', err);
+      saveBtn.innerHTML = original;
+      saveBtn.disabled = false;
+    }
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    if (isNew) {
+      editor.remove();
+    } else {
+      editor.replaceWith(renderEducationCard(entry));
+    }
+  });
+
+  deleteBtn.addEventListener('click', async () => {
+    if (!confirm(`Delete this education entry (${entry.program || entry.degree_type || 'untitled'} @ ${entry.school || '—'})?`)) return;
+
+    try {
+      const res = await fetch(`/api/data/education/${entry.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server error (${res.status})`);
+
+      educationEntries = educationEntries.filter(e => e.id !== entry.id);
+      renderEducationList();
+      configStatus.textContent = 'Education deleted.';
+    } catch (err) {
+      console.log('Education delete failed:', err);
+    }
+  });
+
+  return editor;
+}
+
+function collectEducationForm(editor) {
+  const out = {};
+  editor.querySelectorAll('.profile-field-input').forEach(el => {
+    const key = el.dataset.field;
+    let val = el.value;
+    if (BOOL_EDU_FIELDS.has(key)) {
+      val = Number(val) === 1 ? 1 : 0;
+    } else {
+      val = val.trim();
+    }
+    out[key] = val;
+  });
+  return out;
+}
+
+// ---------- Add new ----------
+educationAddBtn.addEventListener('click', () => {
+  if (educationList.querySelector('.education-editor')) return;
+  const editor = buildEducationEditor(null, null);
+  educationList.prepend(editor);
+});
+
+// ---------- Init ----------
+loadEducation();
+
+
+
+
 
 
 

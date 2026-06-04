@@ -41,20 +41,22 @@ async def resolve_active_page(session) -> Page:
     
 
     # Fallback: prefer last_known if it's still open
-    last = session.last_known_page
-    if last in pages and not last.is_closed():
-        return last
+    # last = session.last_known_page
+    # if last in pages and not last.is_closed():
+    #     return last
     
     # Try focused/visible first
+    # The tab in the foreground reports visible; others report hidden.
     for p in pages:
         try:
-            is_focused = await p.evaluate(
-                "() => document.hasFocus() && document.visibilityState === 'visible'"
-            )
-            if is_focused:
+            if await p.evaluate("() => document.visibilityState") == "visible":
                 return p
         except Exception:
             continue
+
+    # Fallbacks: the last tab we saw open, else the most recent.
+    if session.last_known_page and not session.last_known_page.is_closed():
+        return session.last_known_page
     
     
     

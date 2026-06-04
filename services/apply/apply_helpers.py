@@ -1,5 +1,6 @@
 from playwright.async_api import async_playwright, BrowserContext, Page, Playwright
 from database.queries.get_user_data_apply import get_user_profile, get_user_skills, get_work_experience
+from services.apply.site_detect import detect_site, Site
 # app/services/page_reader.py
 
 # return page html from playwright session
@@ -560,8 +561,15 @@ async def get_form_frame(page):
 #     return fields
 
 
+async def extract_form_fields(target, site: Site | None = None) -> list[dict]:
+    if site is None:
+        site = await detect_site(target)
+    if site == Site.WORKDAY:
+        return await _extract_workday(target)
+    return await extract_generic(target)
 
-async def extract_form_fields(page_or_frame) -> list[dict]:
+
+async def extract_generic(page_or_frame) -> list[dict]:
     """Walk the DOM, return one dict per input. Radio groups are collapsed into single fields."""
     fields = await page_or_frame.evaluate("""
         () => {
@@ -837,3 +845,49 @@ async def extract_form_fields(page_or_frame) -> list[dict]:
         }
     """)
     return fields
+
+
+async def _extract_workday(page_or_frame) -> list[dict]:
+    return await page_or_frame.evaluate(r"""
+        () => {
+            const out = [];
+            let i = 0;
+            const stamp = (el, id) => { el.setAttribute('data-agent-id', id); return id; };
+
+            for (const c of document.querySelectorAll('[data-automation-id^="formField-"]')) {
+                const key = c.getAttribute('data-fkit-id') || '';
+                const labelEl = c.querySelector('label');
+                const question = labelEl ? labelEl.textContent.replace(/\*/g, '').trim() : '';
+                const required = !!c.querySelector('abbr') || !!c.querySelector('[aria-required="true"]');
+
+                const dateWrap  = c.querySelector('[data-automation-id="dateInputWrapper"]');
+                const checkbox  = c.querySelector('input[type="checkbox"]');
+                const fileInput = c.querySelector('input[type="file"]');
+                const dropdown  = c.querySelector('button[aria-haspopup="listbox"]');
+                const multi     = c.querySelector('[data-automation-id="multiSelectContainer"] input');
+                const textarea  = c.querySelector('textarea');
+                const text      = c.querySelector('input[type="text"], input:not([type])');
+
+                const agentId = `wd-${i++}`;
+                let kind, value = '';
+
+                if (dateWrap) {
+                    const m = dateWrap.querySelector('[data-automation-id="dateSectionMonth-input"]');
+                    const y = dateWrap.querySelector('[data-automation-id="dateSectionYear-input"]');
+                    kind = m ? 'workday_date_my' : 'workday_date_y';
+                    if (m) stamp(m, agentId);
+                    if (y) stamp(y, agentId);
+                    value = [m && m.value, y && y.value].filter(Boolean).join('/');
+                } else if (checkbox)  { kind='checkbox';            stamp(checkbox, agentId); value = checkbox.getAttribute('aria-checked')==='true' ? 'true':''; }
+                else if (fileInput)   { kind='file';                stamp(fileInput, agentId); }
+                else if (dropdown)    { kind='workday_dropdown';    stamp(dropdown, agentId); value=(dropdown.textContent||'').trim(); if (value==='Select One') value=''; }
+                else if (multi)       { kind='workday_multiselect'; stamp(multi, agentId); value=multi.value||''; }
+                else if (textarea)    { kind='textarea';            stamp(textarea, agentId); value=textarea.value||''; }
+                else if (text)        { kind='text';                stamp(text, agentId); value=text.value||''; }
+                else continue;
+
+                out.push({ agent_id: agentId, kind, question, name: key, options: null, value, required });
+            }
+            return out;
+        }
+    """)
