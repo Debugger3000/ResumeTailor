@@ -4,6 +4,7 @@ from pathlib import Path
 from docx import Document
 from ollama import AsyncClient
 from const.tailor_prompt import TAILOR_PROMPT, EXTRACT_INDEXES_PROMPT, TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA, TAILOR_REPLACE_INDEX_SCHEMA
+from const.ai_models import ModelType
 import time
 from services.ai_model_control.ollama_client import ollama_client
 from services.ai_model_control.helpers import run_model
@@ -12,7 +13,7 @@ from services.ai_model_control.helpers import run_model
 # OLLAMA_MODEL = os.getenv('OLLAMA_MODEL')
 
 async def extract_applicable_paragraphs(
-    paragraphs: list[dict],
+    paragraphs: list[dict], model_type: ModelType
 ) -> list[dict]:
     """
     Stage 1: Identify which paragraphs contain job titles or tech/skill mentions.
@@ -38,7 +39,7 @@ async def extract_applicable_paragraphs(
     # )
 
     try:
-        parsed, elapsed = await run_model(EXTRACT_INDEXES_PROMPT, user_prompt, TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA)
+        parsed, elapsed = await run_model(EXTRACT_INDEXES_PROMPT, user_prompt, TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA, model_type)
     except json.JSONDecodeError as e:
         print(f"=== run_model call: tailor resume in place JSON DECODE ERROR: {e} ===")
         return {'index': -1, 'text': 'run_model failed at extract_applicable_paragraphs...'} 
@@ -91,7 +92,9 @@ async def tailor_resume_in_place(
     output_path: Path,
     applicable_paragraphs: list[dict],
     job_description: str,
+    model_type: ModelType,
     approved_skills: list[str] | None = None,
+    
 ) -> tuple[int, str]:
     
     # Group input for model
@@ -120,7 +123,7 @@ async def tailor_resume_in_place(
     
 
     try:
-        parsed, elapsed = await run_model(TAILOR_PROMPT, user_prompt, TAILOR_REPLACE_INDEX_SCHEMA)
+        parsed, elapsed = await run_model(TAILOR_PROMPT, user_prompt, TAILOR_REPLACE_INDEX_SCHEMA, model_type)
     except json.JSONDecodeError as e:
         print(f"=== run_model call: tailor resume in place JSON DECODE ERROR: {e} ===")
         return -1, 0.0   

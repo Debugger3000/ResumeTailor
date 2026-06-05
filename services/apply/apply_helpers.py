@@ -113,6 +113,14 @@ async def fill_one(page_or_frame, field: dict) -> None:
         await toggle_button.click()
         return
     
+    # workday specific value adding...
+    if kind == 'workday_dropdown':
+        await fill_workday_dropdown(page_or_frame, agent_id, value)
+        return
+    elif kind == 'workday_multiselect':
+        await fill_workday_multiselect(page_or_frame, agent_id, value)
+        return
+    
     
     
     if kind in ("text", "email", "tel", "textarea", "number", "url", "password"):
@@ -290,6 +298,120 @@ async def fill_react_select(frame, agent_id: str, target_value: str) -> None:
                 el.dispatchEvent(new MouseEvent('click', opts));
             }
         """)
+
+
+# workday select dropdown 
+async def fill_workday_dropdown(frame, agent_id: str, target_value: str) -> None:
+    """
+    Handles Workday's custom button-based listbox dropdowns.
+    The button holds a GUID value; options must be matched by visible text.
+    """
+    button = frame.locator(f'button[data-agent-id="{agent_id}"]')
+    await button.scroll_into_view_if_needed(timeout=5000)
+    await button.click()
+
+    # Wait for listbox to appear
+    await frame.wait_for_selector('[role="listbox"]', state='visible', timeout=5000)
+
+    # Read all options
+    options = await frame.evaluate("""
+        () => {
+            const listbox = document.querySelector('[role="listbox"]');
+            if (!listbox) return [];
+            return Array.from(listbox.querySelectorAll('[role="option"]'))
+                .filter(o => o.offsetParent !== null)
+                .map(o => ({ id: o.id, text: o.innerText.trim() }));
+        }
+    """)
+
+    if not options:
+        raise RuntimeError(f"No options found for workday dropdown {agent_id}")
+
+    # Fuzzy match — handle abbreviations like 'ON' -> 'Ontario'
+    target_lower = target_value.lower().strip()
+    match = (
+        next((o for o in options if o['text'] == target_value), None)
+        or next((o for o in options if o['text'].lower() == target_lower), None)
+        or next((o for o in options if target_lower in o['text'].lower()), None)
+        or next((o for o in options if o['text'].lower() in target_lower), None)
+    )
+
+    if not match:
+        raise RuntimeError(
+            f"No option matching '{target_value}' in {[o['text'] for o in options]}"
+        )
+
+    if match.get('id'):
+        await frame.locator(f'#{match["id"]}').click(timeout=3000)
+    else:
+        await frame.get_by_role('option', name=match['text']).first.click(timeout=3000)
+
+
+async def fill_workday_multiselect(frame, agent_id: str, target_value: str) -> None:
+    """
+    Handles Workday's multiselect search input (data-uxi-widget-type="multiselect").
+    Type to filter, then click the matching option from results.
+    """
+    input_locator = frame.locator(f'input[data-agent-id="{agent_id}"]')
+    await input_locator.scroll_into_view_if_needed(timeout=5000)
+    await input_locator.click()
+    await input_locator.fill(target_value)
+    await frame.wait_for_timeout(800)  # let search debounce
+
+    # Get the multiselect container id to scope the search
+    multiselect_id = await frame.evaluate("""
+        (agentId) => {
+            const el = document.querySelector(`input[data-agent-id="${agentId}"]`);
+            return el ? el.getAttribute('data-uxi-multiselect-id') : null;
+        }
+    """, agent_id)
+
+    # Wait for options to appear scoped to this multiselect
+    try:
+        await frame.wait_for_function("""
+            (msId) => {
+                const container = document.getElementById(msId);
+                if (!container) return false;
+                const options = container.querySelectorAll('[role="option"], [data-automation-id="multiSelectOption"]');
+                return options.length > 0;
+            }
+        """, arg=multiselect_id, timeout=5000)
+    except Exception:
+        raise RuntimeError(f"No options appeared for multiselect {agent_id} after typing '{target_value}'")
+
+    # Read options
+    options = await frame.evaluate("""
+        (msId) => {
+            const container = document.getElementById(msId);
+            if (!container) return [];
+            return Array.from(container.querySelectorAll(
+                '[role="option"], [data-automation-id="multiSelectOption"]'
+            ))
+            .filter(o => o.offsetParent !== null)
+            .map(o => ({ id: o.id, text: o.innerText.trim() }));
+        }
+    """, multiselect_id)
+
+    if not options:
+        raise RuntimeError(f"No visible options for multiselect {agent_id}")
+
+    target_lower = target_value.lower().strip()
+    match = (
+        next((o for o in options if o['text'] == target_value), None)
+        or next((o for o in options if o['text'].lower() == target_lower), None)
+        or next((o for o in options if target_lower in o['text'].lower()), None)
+    )
+
+    if not match:
+        raise RuntimeError(
+            f"No option matching '{target_value}' in {[o['text'] for o in options]}"
+        )
+
+    if match.get('id'):
+        await frame.locator(f'#{match["id"]}').click(timeout=3000)
+    else:
+        await frame.get_by_role('option', name=match['text']).first.click(timeout=3000)
+
 
 async def find_apply_frame(page):
     """

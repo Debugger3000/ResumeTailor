@@ -49,7 +49,6 @@ applicable_paragraphs: [
 You are too only edit indexes contained within applicable_paragraphs.
 
 Rules:
-You are too:
 Add or swap skills found in applicable_paragraphs with skills from list of approved_skills that match ones in the JD.
 Swap job titles with one found in the JD.
 Leave all formatting alone.

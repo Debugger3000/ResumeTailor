@@ -6,6 +6,7 @@ from services.apply.apply_agent import populate_field_values
 from services.browser.browser_helpers import resolve_active_page, wait_for_page_ready, find_form_target
 from services.apply.apply_fields_filter import filter_fields
 from services.apply.site_detect import detect_site
+from const.ai_models import ModelType
 
 apply_bp = Blueprint('apply', __name__)
 
@@ -52,6 +53,12 @@ async def apply_start():
 @apply_bp.route('/fillform', methods=['POST'])
 async def apply_begin():
     print("begin hit")
+    # body = await request.get_json()
+    # incoming = body.get('skills', [])
+
+    # grab model to use from client. Default to 'cloud'
+    currentModelTypeSelected = request.args.get('modelType', 'cloud')
+    model_type = ModelType.CLOUD if currentModelTypeSelected == 'cloud' else ModelType.LOCAL
 
     session = manager.current
     if not session:
@@ -84,7 +91,7 @@ async def apply_begin():
     # Model populates values of fields
     # -----------------------
     # give model fields data, so it can populate it with user data
-    populated_fields, elapsed = await populate_field_values(filtered_fields)
+    populated_fields, elapsed = await populate_field_values(filtered_fields, model_type)
 
 
     # pass populated_fields and sessions page to be filled with data

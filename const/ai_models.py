@@ -17,3 +17,8 @@ class OllamaStatus(TypedDict):
     loaded_models: list[str]
     error: str | None
 
+
+class ModelType(str, Enum):
+    CLOUD = "cloud"
+    LOCAL = "local"
+

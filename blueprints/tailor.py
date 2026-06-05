@@ -5,6 +5,7 @@ from quart import Blueprint, request, jsonify, send_file
 import uuid
 # from const.approved_skills import approved_skills
 from database.queries.get_user_skills import get_user_skils
+from const.ai_models import ModelType
 
 from ollama import AsyncClient
 # from services.docx_tools import TOOL_SCHEMAS, TOOL_REGISTRY
@@ -37,6 +38,11 @@ async def tailor():
     job_description = form.get('job_description')
     resume_file = files.get('resume')
 
+    currentModelTypeSelected = request.args.get('modelType', 'cloud')
+    print(currentModelTypeSelected)
+
+    model_type = ModelType.CLOUD if currentModelTypeSelected == 'cloud' else ModelType.LOCAL
+
     if not job_description or not resume_file:
         return jsonify({'error': 'Missing job_description or resume'}), 400
 
@@ -52,7 +58,7 @@ async def tailor():
 
     # Model Processing Stages
     # 1. Get applicable doc indexes by filtering for job titles or skill matches
-    applicable_paragraphs = await extract_applicable_paragraphs(paragraphs)
+    applicable_paragraphs = await extract_applicable_paragraphs(paragraphs, model_type)
 
 
     # get user skills from database
@@ -64,7 +70,7 @@ async def tailor():
         # run list of lines / paragraphs to model to swap ones that match model prompt
             # summary, skills, job titles, bullet points...
     changes_count, model_summary = await tailor_resume_in_place(
-        original_path, output_path, applicable_paragraphs, job_description, user_skills,
+        original_path, output_path, applicable_paragraphs, job_description, model_type, user_skills
     )
     print("After Model Summary")
 

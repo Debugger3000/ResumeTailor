@@ -63,7 +63,7 @@ tailorBtn.addEventListener('click', async () => {
 
 
   try {
-    const res = await fetch('/api/tailor', { method: 'POST', body: formData });
+    const res = await fetch(`/api/tailor?modelType=${currentModelTypeSelected}`, { method: 'POST', body: formData });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || `Server error (${res.status})`);
@@ -257,7 +257,7 @@ beginBtn.addEventListener('click', async () => {
   addLog('Agent filling forms on current page...', 'action');
 
   try {
-    const res = await fetch('/api/apply/fillform', {
+    const res = await fetch(`/api/apply/fillform?modelType=${currentModelTypeSelected}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: state.sessionId }),
@@ -1239,6 +1239,8 @@ function initModelToggle() {
       currentModelTypeSelected = kind;
       syncModelToggle();              // instant visual feedback
       await restart_model_server();   // bring the now-active config online
+      console.log("current model type:");
+      console.log(currentModelTypeSelected);
     });
   });
 

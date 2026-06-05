@@ -1,6 +1,6 @@
 
 from database.queries.ai_models import get_model_config
-from const.ai_models import ModelProvider, OllamaStatus
+from const.ai_models import ModelProvider, OllamaStatus, ModelType
 import requests
 from services.ai_model_control.claude_client import claude_client
 from services.ai_model_control.ollama_client import ollama_client
@@ -68,7 +68,10 @@ def ollama_status(model: ModelProvider) -> OllamaStatus:
 
 
 
-async def run_model(system_prompt: str, user_content: str, schema: dict) -> tuple[dict, float]:
+async def run_model(system_prompt: str, user_content: str, schema: dict, model_type: ModelType) -> tuple[dict, float]:
+
+    print("model type in run_model:")
+    print(model_type)
 
     models = get_model_config()
     if not models:
@@ -85,9 +88,9 @@ async def run_model(system_prompt: str, user_content: str, schema: dict) -> tupl
 
     if is_model_listed():
         # if no model config exists, it doesnt start any...
-        cloud_model = next((m for m in models if not is_model_local(m.get('provider'))),None,)
+        #cloud_model = next((m for m in models if not is_model_local(m.get('provider'))),None,)
 
-        if not cloud_model:
+        if model_type == ModelType.LOCAL:
             response = await ollama_client.chat(
                 model=ollama_client.model,
                 messages=messages,

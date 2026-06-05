@@ -4,12 +4,13 @@ import time
 from ollama import AsyncClient
 
 from const.apply_prompt import APPLY_PROMPT, POPULATE_FIELDS_SCHEMA
+from const.ai_models import ModelType
 #from const.personal_info import PROFILE  # adjust import to wherever your profile lives
 from services.ai_model_control.ollama_client import ollama_client
 from services.apply.apply_helpers import get_full_user_data
 from services.ai_model_control.helpers import run_model
 
-async def populate_field_values(fields: list[dict]) -> tuple[list[dict], float]:
+async def populate_field_values(fields: list[dict], model_type: ModelType) -> tuple[list[dict], float]:
     """
     Given the extracted form fields, ask the model to populate an array of lean answers, 
     then stitch the values straight back into the original HTML kind metadata blocks.
@@ -20,7 +21,7 @@ async def populate_field_values(fields: list[dict]) -> tuple[list[dict], float]:
     })
 
     try:
-        parsed, elapsed = await run_model(APPLY_PROMPT, user_prompt, POPULATE_FIELDS_SCHEMA)
+        parsed, elapsed = await run_model(APPLY_PROMPT, user_prompt, POPULATE_FIELDS_SCHEMA, model_type)
         
     except json.JSONDecodeError as e:
         print(f"=== run_model call: POPULATE FIELDS JSON DECODE ERROR: {e} ===")
