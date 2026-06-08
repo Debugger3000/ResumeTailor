@@ -1,6 +1,7 @@
 from playwright.async_api import async_playwright, BrowserContext, Page, Playwright
 from database.queries.get_user_data_apply import get_user_profile, get_user_skills, get_work_experience
 from services.apply.site_detect import detect_site, Site
+from database.queries.education import get_user_education
 # app/services/page_reader.py
 
 # return page html from playwright session
@@ -21,6 +22,7 @@ def get_full_user_data() -> dict:
     return {
         **get_user_profile(),          # Flattens keys
         "experience": get_work_experience(),
+        "education": get_user_education(),
         "skills": get_user_skills(),
     }
 

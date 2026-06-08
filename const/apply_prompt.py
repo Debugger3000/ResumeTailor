@@ -7,6 +7,7 @@ Input:
 - profile: {
     name: "...",
     experience: [...],
+    education: [...],
     skills: [...],
 }
 - fields: A variable array of form field objects extracted from the page.
