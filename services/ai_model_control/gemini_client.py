@@ -64,7 +64,7 @@ class GeminiClient:
             raise RuntimeError("model_config.model_name is not set")
         self._client = genai.Client(api_key=api_key)
 
-    async def chat(self, messages, schema=None, temperature=0.0, max_tokens=4096):
+    async def chat(self, messages, schema=None, temperature=0.0, max_tokens=8192):
         if self._client is None:
             raise RuntimeError("Gemini client not configured")
 
