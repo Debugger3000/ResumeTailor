@@ -28,16 +28,6 @@ async def extract_applicable_paragraphs(
     print(f"=== Stage 1: extracting applicable indexes. Input size: {len(user_prompt)} chars ===")
     start = time.time()
 
-    # response = await ollama_client.chat(
-    #     model=ollama_client.model,
-    #     messages=[
-    #         {'role': 'system', 'content': EXTRACT_INDEXES_PROMPT},
-    #         {'role': 'user', 'content': user_prompt},
-    #     ],
-    #     format=TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA,
-    #     options={'temperature': 0.0},
-    # )
-
     try:
         parsed, elapsed = await run_model(EXTRACT_INDEXES_PROMPT, user_prompt, TAILOR_EXTRACT_PARAGRAPHS_INDEXES_SCHEMA, model_type)
     except json.JSONDecodeError as e:
@@ -108,18 +98,6 @@ async def tailor_resume_in_place(
     print(f"Input prompt: {user_prompt}")
     print(f"Input prompt: {job_description}")
     # start = time.time()
-
-    # get running ollama client and give list of paragraphs to change...
-    # response = await ollama_client.chat(
-    #     model=ollama_client.model,
-    #     messages=[
-    #         {'role': 'system', 'content': TAILOR_PROMPT},
-    #         {'role': 'user', 'content': user_prompt},
-    #     ],
-    #     format=TAILOR_REPLACE_INDEX_SCHEMA,
-    #     options={'temperature': 0.0},
-    # )
-
     
 
     try:
@@ -168,35 +146,3 @@ async def tailor_resume_in_place(
     print(f"tailor_resume_in_place applied {len(changes)} changes")
     print(f"model summary: {summary}")
     return len(changes), summary
-
-
-
-
-
-
-
-
-
-
-
-
-# async def score_fit(resume_paragraphs: list[dict], job_description: str) -> int:
-#     """Get a 0-100 fit score from the model."""
-#     resume_text = '\n'.join(p['text'] for p in resume_paragraphs)
-#     response = await ollama_client.chat(
-#         model=ollama_client.model,
-#         messages=[
-#             {
-#                 'role': 'system',
-#                 'content': 'Score resume-job fit from 0 to 100. Respond ONLY with the integer.',
-#             },
-#             {
-#                 'role': 'user',
-#                 'content': f"JOB:\n{job_description}\n\nRESUME:\n{resume_text}",
-#             },
-#         ],
-#     )
-#     try:
-#         return int(''.join(c for c in response['message']['content'] if c.isdigit())[:3])
-#     except ValueError:
-#         return 0

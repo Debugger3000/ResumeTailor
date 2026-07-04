@@ -48,13 +48,6 @@ class OllamaClient:
         response = await self._client.chat(model=use_model, messages=messages, **kwargs)
         return response["message"]["content"]
 
-    # async def generate(self, prompt: str, model: Optional[str] = None, **kwargs) -> str:
-    #     use_model = model or self.model
-    #     if not use_model:
-    #         raise ValueError("No model set.")
-    #     response = await self._client.generate(model=use_model, prompt=prompt, **kwargs)
-    #     return response["response"]
-
 
 # Module-level singleton — import this anywhere
 ollama_client = OllamaClient()

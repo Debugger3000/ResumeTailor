@@ -65,9 +65,6 @@ def ollama_status(model: ModelProvider) -> OllamaStatus:
 # Call current model for use 
 # return structured json data
 # ai/inference.py
-
-
-
 async def run_model(system_prompt: str, user_content: str, schema: dict, model_type: ModelType) -> tuple[dict, float]:
 
     print("model type in run_model:")

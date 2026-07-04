@@ -57,7 +57,8 @@ async def tailor():
 
 
     # Model Processing Stages
-    # 1. Get applicable doc indexes by filtering for job titles or skill matches
+    # --- 1. 
+    # Get applicable doc indexes by filtering for job titles or skill matches
     applicable_paragraphs = await extract_applicable_paragraphs(paragraphs, model_type)
 
 
@@ -66,16 +67,14 @@ async def tailor():
     print("user skills:")
     print(user_skills)
 
-    # 2. Process each line for tailoring
+    # --- 2. 
+    # Process each line for tailoring
         # run list of lines / paragraphs to model to swap ones that match model prompt
             # summary, skills, job titles, bullet points...
     changes_count, model_summary = await tailor_resume_in_place(
         original_path, output_path, applicable_paragraphs, job_description, model_type, user_skills
     )
     print("After Model Summary")
-
-    #
-    # score = await score_fit(paragraphs, job_description)
 
     SESSIONS[session_id] = {
         'original_filename': resume_file.filename,
