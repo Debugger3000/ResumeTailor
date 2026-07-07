@@ -2,7 +2,7 @@
 
 # JobPilot
 
-### Your AI agent for Resume Tailoring and Form Completion
+### Your locally hosted AI 'agent' for Resume Tailoring and Form Completion
 
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![macOS](https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white)
@@ -33,7 +33,7 @@
 
 ## 📝 What does this application do?
 
-Automate Resume Tailoring and Form Completion with the click of a button!
+Automated Resume Tailoring and Form Completion with the click of a button!
 
 ### Resume Tailoring
 Tailor your resume by providing a job description and an upload of your .docx resume. Provide skills and the model will swap job titles and skills as you see fit.
@@ -47,7 +47,7 @@ Fill in long application forms with the click of a button. Personal info, skills
 
 ## 💻 Requirements
 
-**You are required** to configure either a local Ollama model or a Cloud model (Gemini - free api).
+**You are required** to run this locally and configure either a local Ollama model or a Cloud model (Gemini - free api). I suggest using Gemini as its simpler to setup.
 
 **Be mindful** that while local models are data secure they require good hardware to run quickly. 
 
