@@ -35,6 +35,8 @@
 
 Automated Resume Tailoring and Form Completion with the click of a button!
 
+TBH: Resume tailor can be useful for similar job titles / skill swaps that are annoying to do. However can be extended with a better prompt if thats your use case. The form completion feature is where it shines though. I use that for every job application because it covers mostly everything past personal info that browsers can auto fill. Its not perfect but I have found it quite useful.
+
 ### Resume Tailoring
 Tailor your resume by providing a job description and an upload of your .docx resume. Provide skills and the model will swap job titles and skills as you see fit.
 
