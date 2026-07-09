@@ -74,14 +74,10 @@ Fill in long application forms with the click of a button. Personal info, skills
 | **Local Model** | Ollama |
 | --- | [Download & Install](https://ollama.com/download) |
 | --- | A compatible LLM via Ollama (e.g. `llama3` or `qwen3:8b`) — [Browse Models](https://ollama.com/library) |
-| **Cloud Model** | Gemini |
+| **Cloud Model** | Gemini - Free Tier or Paid |
 | --- | [Configure Gemini API](https://aistudio.google.com/) |
 
 ## Application Information
-
-### Model Use
-- As stated above, you have to use either a local or cloud model.
-- *Cloud model support limited to free Gemnini 2.5 Fast*
 
 ### Open-Source
 - You might want to add columns to the user_profile database table for more coverage on forms. Or anything else within the database schema.
