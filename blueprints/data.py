@@ -134,6 +134,8 @@ async def save_model():
     host        = (body.get('host') or '').strip() or None
     api_key_env = (body.get('api_key_env') or None)
 
+    print(provider_category)
+
     print("api key for cloud modellll")
     print(api_key_env)
 
@@ -162,6 +164,7 @@ async def updated_model_run():
     want_local = (kind == 'local')
 
     models = get_model_config()   # list of 0–2 rows
+    print(models)
 
     # Find the saved config for the requested side
     model = next(

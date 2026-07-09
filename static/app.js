@@ -751,7 +751,8 @@ const MODEL_CATALOG = [
   { provider: 'ollama', model_name: 'gemma4',            host: 'http://localhost:11434', api_key_env: null, category: 'Local',   desc: 'Gemma 4 — Google, vision + tools' },
 
   // ============== GOOGLE ==============
-  { provider: 'google',    model_name: 'gemini-2.5-flash',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud', desc: 'Gemini 2.5 Flash — fast' },
+  { provider: 'google',    model_name: 'gemini-2.5-flash-lite',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud', desc: 'Gemini 2.5 Flash Lite' },
+  { provider: 'google',    model_name: 'gemini-3.1-flash-lite',        host: 'https://generativelanguage.googleapis.com', api_key_env: 'GOOGLE_API_KEY', category: 'Cloud', desc: 'Gemini 3.1 Flash Lite' }
 ];
 
 // ============== ANTHROPIC ==============
@@ -1122,6 +1123,7 @@ async function loadModelConfig() {
     }
 
     // Endpoint now returns an array of rows (0–2). Tolerate a {configs:[...]} wrapper too.
+    console.log(data);
     const rows = Array.isArray(data) ? data : (data.configs || []);
 
     
