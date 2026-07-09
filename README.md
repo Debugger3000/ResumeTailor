@@ -1,6 +1,6 @@
 <div align="center">
 
-# JobPilot
+# Auto Job
 
 ### Your locally hosted AI 'agent' for Resume Tailoring and Form Completion
 
@@ -21,6 +21,14 @@
 </div>
 
 ---
+
+## Preview
+
+<img width="991" height="924" alt="autojob_form_pic" src="https://github.com/user-attachments/assets/be9bbc61-a6b3-486f-b44b-0f5164858fc9" />
+
+
+---
+
 
 ## 📖 Chapters
 - [What does this application do?](#-what-does-this-application-do)
