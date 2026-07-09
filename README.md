@@ -24,7 +24,8 @@
 
 ## Preview
 
-<img width="991" height="924" alt="autojob_form_pic" src="https://github.com/user-attachments/assets/be9bbc61-a6b3-486f-b44b-0f5164858fc9" />
+<img width="994" height="912" alt="autojob_config_pic02" src="https://github.com/user-attachments/assets/d76728c2-2e1b-4e2a-9596-e18ee5bcead3" />
+
 
 
 ---
