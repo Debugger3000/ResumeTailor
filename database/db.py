@@ -51,6 +51,7 @@ def init_db():
                 email TEXT,
                 phone TEXT,
                 date_of_birth TEXT,
+                account_password TEXT,
                 -- address
                 street TEXT,
                 city TEXT,

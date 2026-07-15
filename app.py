@@ -27,6 +27,11 @@ from services.ai_model_control.gemini_client import gemini_client
 # deactivate - `deactivate`
 
 
+# Sqlite3 commands
+    # DB Dump 
+# sqlite3 ./database/data/autojobdata.db .dump > backup.sql 
+
+
 
 # App instance var
 app = Quart(__name__)
